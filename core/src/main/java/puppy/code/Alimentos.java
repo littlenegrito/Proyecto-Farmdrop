@@ -3,76 +3,94 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package puppy.code;
-import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.Rectangle;
-
-public abstract class Alimentos implements Elemento {
+import com.badlogic.gdx.math.*;
+public abstract class Alimentos implements Accionable {
     protected int puntos;
     protected int vida;
+    protected int velocidad;
     
     protected Texture textura;
     protected Rectangle area;
-    protected int velocidad;
-
-    public Alimentos(Texture textura, int velocidad) {
-        this.vida = vida;this.textura = textura;
-        this.velocidad = velocidad;
-        this.area = new Rectangle(MathUtils.random(0, 800 - 64), 480, 64, 64);
-    }
-
-    @Override
-    public void activarEfecto(Tarro tarro) {
-        tarro.sumarPuntos(puntos);
-        //tarro.sumarVida(vida);
-    }
-    @Override
-    public int obtenerPuntaje() {
-        return 10; // Ejemplo: 10 puntos por cada elemento bueno
-    }
+    protected int efecto;
     
-    @Override
-    public boolean esBueno() {
-        return true;
+    public Alimentos(Texture textura, int velocidad, int vida) {
+        setVida(vida);   // Encapsulado con setter
+        setTextura(textura);   // Encapsulado con setter
+        setVelocidad(velocidad);  // Encapsulado con setter
+        this.area = new Rectangle(MathUtils.random(0, 800 - 64), 480, 64, 64); // Rectángulo del área
     }
-    
+    //
+    // Metodos interfaces
+    //
     @Override
-    public int obtenerVida() {
-        return 0; // No causa daño
-    }
-
-    @Override
-    public String obtenerNombre() {
-        return "Alimento";
+    public void moverElemento(float deltaTime) {
+        area.y -= velocidad * deltaTime;
     }
     
     @Override
     public void dibujar(SpriteBatch batch) {
         batch.draw(textura, area.x, area.y);
     }
-
-    @Override
-    public void desaparecer() {
-        // Puedes implementar la lógica de eliminar o reciclar el elemento si es necesario.
-    }
-
-    @Override
-    public void detenerMovimiento() {
-        // Implementar si necesitas pausar el movimiento
-    }
-    @Override
-    public void moverElemento(float deltaTime) {
-        area.y -= velocidad * deltaTime;
-    }
-
+    
     @Override
     public boolean esRecogido(Rectangle tarroArea) {
         return area.overlaps(tarroArea);
     }
 
     @Override
+    public void desaparecer() {
+        // Puedes implementar la lógica de eliminar o reciclar el elemento si es necesario.
+    }
+    @Override
+    public Texture obtenerTextura() {
+        return textura; // Devolver la textura de la fruta
+    }
+    public abstract void activarEfecto(Tarro tarro);  // El método que define el efecto sobre el jugador
+    //
+    // Getters, abstractos
+    //
+    public abstract int obtenerVida();
+    public abstract int obtenerPuntaje();
+    public abstract String obtenerNombre();
+    public abstract int obtenerVelocidad(); 
+    public abstract String obtenerTipo();
+    
+    public abstract void reiniciar(); // Restaura el estado del elemento a su condición inicial, útil para reciclar objetos en lugar de crear nuevos durante el juego.
+    public abstract void aplicarModificador(float factor); // Ajusta temporalmente las propiedades del elemento, como aumentar su velocidad o efecto, en función de potenciadores o cambios en la dificultad.
+    
+    //
+    // Metodos concretos
+    //
+    public boolean esBueno() {
+        return true;
+    }
+    public void detenerMovimiento() { // Pausa el movimiento del elemento, útil en caso de que el juego se detenga o necesite congelar temporalmente la acción.
+        this.velocidad = 0;// Implementar si necesitas pausar el movimiento
+    }
     public boolean estaEnPantalla() {
         return area.y + 64 >= 0;
     }
-    
+    //
+    // Setters
+    //
+    public void setVida(int vida) {
+        this.vida = vida;
+    }
+
+    public void setPuntos(int puntos) {
+        this.puntos = puntos;
+    }
+
+    public void setTextura(Texture textura) {
+        this.textura = textura;
+    }
+
+    public void setVelocidad(int velocidad) {
+        this.velocidad = velocidad;
+    }
+    public void setEfecto(int efecto){
+        this.efecto = efecto;
+    }
 }
