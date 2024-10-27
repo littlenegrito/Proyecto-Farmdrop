@@ -17,6 +17,7 @@ public class GameScreen implements Screen {
     private BitmapFont font;
     private Tarro tarro;
     private Entorno entorno;
+    private Lluvia lluvia;
     
     public GameScreen(final GameLluviaMenu game) {
         this.game = game;
@@ -27,18 +28,27 @@ public class GameScreen implements Screen {
         Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("hurt.ogg"));
         Sound dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
         Music rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
+        
 
         // Crear tarro del jugador
         tarro = new Tarro(new Texture(Gdx.files.internal("bucket.png")), hurtSound);
-        tarro.crear();
-
+        
+        Texture gota = new Texture(Gdx.files.internal("drop.png"));
+        Texture gotaMala = new Texture(Gdx.files.internal("dropBad.png"));
+        
         // Crear el entorno de juego (elementos como frutas, peligros, etc.)
-        entorno = new Entorno(tarro, dropSound, rainMusic);
-        entorno.crear();
+        lluvia = new Lluvia(gota, gotaMala, dropSound, rainMusic);
+        entorno = new Entorno(dropSound, rainMusic);
 
-        // Configurar la cámara
-        camera = new OrthographicCamera();
-        camera.setToOrtho(false, 800, 480);
+        // camera
+	camera = new OrthographicCamera();
+	camera.setToOrtho(false, 800, 480);
+	batch = new SpriteBatch();
+        
+        // creacion de objetos
+        tarro.crear();
+        lluvia.crear();
+        entorno.crear();
     }
 
     @Override
@@ -46,12 +56,11 @@ public class GameScreen implements Screen {
         // Limpiar la pantalla
         ScreenUtils.clear(0, 0, 0.2f, 1);
         camera.update();
-
+        //actualizar 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-
         // Dibujar la puntuación y vidas
-        font.draw(batch, "Gotas totales: " + tarro.getPuntos(), 5, 475);
+        font.draw(batch, "Puntos totales: " + tarro.getPuntos(), 5, 475);
         font.draw(batch, "Vidas : " + tarro.getVidas(), 670, 475);
         font.draw(batch, "HighScore : " + game.getHigherScore(), camera.viewportWidth / 2 - 50, 475);
 
@@ -60,7 +69,7 @@ public class GameScreen implements Screen {
             tarro.actualizarMovimiento();
 
             // Actualizar el movimiento de los elementos en el entorno
-            if (!entorno.actualizarMovimiento(tarro)) {
+            if (!entorno.actualizarMovimiento(tarro) || !lluvia.actualizarMovimiento(tarro)) {
                 if (game.getHigherScore() < tarro.getPuntos()) {
                     game.setHigherScore(tarro.getPuntos());
                 }
@@ -71,6 +80,7 @@ public class GameScreen implements Screen {
 
         // Dibujar el tarro y los elementos
         tarro.dibujar(batch);
+        lluvia.actualizarDibujoLluvia(batch);
         entorno.actualizarDibujo(batch);
 
         batch.end();
@@ -80,6 +90,7 @@ public class GameScreen implements Screen {
     }
     @Override
     public void show() {
+        lluvia.continuar();
         entorno.continuar();
     }
     @Override
@@ -88,6 +99,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void pause() {
+        lluvia.pausar();
         entorno.pausar();
         game.setScreen(new PausaScreen(game, this));
     }
@@ -98,6 +110,7 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         tarro.destruir();
+        lluvia.destruir();
         entorno.destruir();
     }
 

@@ -11,8 +11,8 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
 
 public class Lluvia {
-	private Array<Rectangle> rainDropsPos;
-	private Array<Integer> rainDropsType;
+    private Array<Rectangle> rainDropsPos;
+    private Array<Integer> rainDropsType;
     private long lastDropTime;
     private Texture gotaBuena;
     private Texture gotaMala;
@@ -50,43 +50,35 @@ public class Lluvia {
 	      lastDropTime = TimeUtils.nanoTime();
 	   }
 	
-   public boolean actualizarMovimiento(Tarro tarro) {
-        // Generar nuevos elementos si ha pasado suficiente tiempo
-        if (TimeUtils.nanoTime() - lastDropTime > 1000000000) crearElemento();
-
-        // Actualizar la posición de los elementos
-        for (int i = 0; i < elementosPos.size; i++) {
-            Rectangle elementoPos = elementosPos.get(i);
-            Accionable elemento = elementos.get(i);
-
-            elementoPos.y -= 300 * Gdx.graphics.getDeltaTime();
-            elemento.moverElemento(Gdx.graphics.getDeltaTime());
-
-            // Eliminar el elemento si cae al suelo
-            if (elementoPos.y + 64 < 0) {
-                elementosPos.removeIndex(i);
-                elementos.removeIndex(i);
-                continue;
-            }
-
-            // Si el elemento colisiona con el tarro
-            if (elementoPos.overlaps(tarro.getArea())) {
-                elemento.activarEfecto(tarro); // Aplicar el efecto en el tarro
-
-                // Sonido de recolección si es un alimento
-                if (elemento instanceof Alimentos) {
-                    dropSound.play();
-                }
-
-                // Remover el elemento tras la colisión
-                elementosPos.removeIndex(i);
-                elementos.removeIndex(i);
-            }
-        }
-
-        // Verificar si el jugador ha perdido
-        return tarro.getVidas() > 0;
-    }
+   public boolean actualizarMovimiento(Tarro tarro) { 
+	   // generar gotas de lluvia 
+	   if(TimeUtils.nanoTime() - lastDropTime > 100000000) crearGotaDeLluvia();
+	   // revisar si las gotas cayeron al suelo o chocaron con el tarro
+	   for (int i=0; i < rainDropsPos.size; i++ ) {
+		  Rectangle raindrop = rainDropsPos.get(i);
+	      raindrop.y -= 300 * Gdx.graphics.getDeltaTime();
+	      //cae al suelo y se elimina
+	      if(raindrop.y + 64 < 0) {
+	    	  rainDropsPos.removeIndex(i); 
+	    	  rainDropsType.removeIndex(i);
+	      }
+	      if(raindrop.overlaps(tarro.getArea())) { //la gota choca con el tarro
+	    	if(rainDropsType.get(i)==1) { // gota dañina
+	    	  tarro.dañar();
+	    	  if (tarro.getVidas()<=0)
+	    		 return false; // si se queda sin vidas retorna falso /game over
+	    	  rainDropsPos.removeIndex(i);
+	          rainDropsType.removeIndex(i);
+	      	}else { // gota a recolectar
+	    	  tarro.sumarPuntos(10);
+	          dropSound.play();
+	          rainDropsPos.removeIndex(i);
+	          rainDropsType.removeIndex(i);
+	      	}
+	      }
+	   } 
+	  return true; 
+   }
    
    public void actualizarDibujoLluvia(SpriteBatch batch) { 
 	   

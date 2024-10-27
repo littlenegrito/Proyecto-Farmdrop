@@ -70,7 +70,7 @@ public abstract class Alimentos implements Accionable {
         this.velocidad = 0;// Implementar si necesitas pausar el movimiento
     }
     public boolean estaEnPantalla() {
-        return area.y + 64 >= 0;
+        return area.y + area.height >= 0 && area.y <= 480;
     }
     //
     // Setters
