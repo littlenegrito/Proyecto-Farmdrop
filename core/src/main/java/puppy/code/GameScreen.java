@@ -8,6 +8,8 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.ScreenUtils;
 
 public class GameScreen implements Screen {
@@ -29,16 +31,21 @@ public class GameScreen implements Screen {
         Sound dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.wav"));
         Music rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.mp3"));
         
+        System.out.println("Regiones en el atlas:");
+        for (TextureAtlas.AtlasRegion region : game.getAtlas().getRegions()) {
+            System.out.println(region.name);
+        }
+        
 
         // Crear tarro del jugador
-        tarro = new Tarro(new Texture(Gdx.files.internal("bucket.png")), hurtSound);
+        tarro = new Tarro(game.getAtlas().findRegion("basket"), hurtSound);
         
-        Texture gota = new Texture(Gdx.files.internal("drop.png"));
-        Texture gotaMala = new Texture(Gdx.files.internal("dropBad.png"));
+        //TextureRegion gota = game.getAtlas().findRegion("drop");
+        //TextureRegion gotaMala = game.getAtlas().findRegion("dropBad");
         
         // Crear el entorno de juego (elementos como frutas, peligros, etc.)
-        lluvia = new Lluvia(gota, gotaMala, dropSound, rainMusic);
-        entorno = new Entorno(dropSound, rainMusic);
+        //lluvia = new Lluvia(gota, gotaMala, dropSound, rainMusic);
+        entorno = new Entorno(game.getAtlas(),dropSound, rainMusic);
 
         // camera
 	camera = new OrthographicCamera();
@@ -47,7 +54,7 @@ public class GameScreen implements Screen {
         
         // creacion de objetos
         tarro.crear();
-        lluvia.crear();
+        //lluvia.crear();
         entorno.crear();
     }
 
@@ -69,7 +76,7 @@ public class GameScreen implements Screen {
             tarro.actualizarMovimiento();
 
             // Actualizar el movimiento de los elementos en el entorno
-            if (!entorno.actualizarMovimiento(tarro) || !lluvia.actualizarMovimiento(tarro)) {
+            if (!entorno.actualizarMovimiento(tarro)) {
                 if (game.getHigherScore() < tarro.getPuntos()) {
                     game.setHigherScore(tarro.getPuntos());
                 }
@@ -80,7 +87,7 @@ public class GameScreen implements Screen {
 
         // Dibujar el tarro y los elementos
         tarro.dibujar(batch);
-        lluvia.actualizarDibujoLluvia(batch);
+        //lluvia.actualizarDibujoLluvia(batch);
         entorno.actualizarDibujo(batch);
 
         batch.end();
@@ -90,7 +97,7 @@ public class GameScreen implements Screen {
     }
     @Override
     public void show() {
-        lluvia.continuar();
+        //lluvia.continuar();
         entorno.continuar();
     }
     @Override
@@ -99,7 +106,7 @@ public class GameScreen implements Screen {
 
     @Override
     public void pause() {
-        lluvia.pausar();
+        //lluvia.pausar();
         entorno.pausar();
         game.setScreen(new PausaScreen(game, this));
     }
@@ -110,8 +117,9 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         tarro.destruir();
-        lluvia.destruir();
+        //lluvia.destruir();
         entorno.destruir();
     }
 
 }
+
