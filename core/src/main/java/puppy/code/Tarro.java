@@ -5,13 +5,14 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 
 
 public class Tarro {
 	   private Rectangle bucket;
-	   private Texture bucketImage;
+	   private TextureRegion bucketImage;
 	   private Sound sonidoHerido;
 	   private int vidas = 3;
 	   private int puntos = 0;
@@ -19,12 +20,14 @@ public class Tarro {
 	   private boolean herido = false;
 	   private int tiempoHeridoMax=50;
 	   private int tiempoHerido;
-	   
-	   
-	   public Tarro(Texture tex, Sound ss) {
-		   bucketImage = tex;
-		   sonidoHerido = ss;
-	   }
+           
+	   public Tarro(TextureRegion tex, Sound ss) {
+                this.bucketImage = tex;
+                if (this.bucketImage == null) {
+                    System.err.println("Error: La textura del tarro no se ha cargado correctamente.");
+                }
+                this.sonidoHerido = ss;
+            }
 	   
 		public int getVidas() {
 			return vidas;
@@ -55,15 +58,18 @@ public class Tarro {
 		  sonidoHerido.play();
 	   }
 	   public void dibujar(SpriteBatch batch) {
-		 if (!herido)  
-		   batch.draw(bucketImage, bucket.x, bucket.y);
-		 else {
-		
-		   batch.draw(bucketImage, bucket.x, bucket.y+ MathUtils.random(-5,5));
-		   tiempoHerido--;
-		   if (tiempoHerido<=0) herido = false;
-		 }
-	   } 
+                float scale = 0.2f;  // Cambia este valor para ajustar el tamaño
+                float tarroWidth = bucketImage.getRegionWidth() * scale;
+                float tarroHeight = bucketImage.getRegionHeight() * scale;
+
+                if (!herido) {
+                    batch.draw(bucketImage, bucket.x, bucket.y, tarroWidth, tarroHeight);
+                } else {
+                    batch.draw(bucketImage, bucket.x, bucket.y + MathUtils.random(-5, 5), tarroWidth, tarroHeight);
+                    tiempoHerido--;
+                    if (tiempoHerido <= 0) herido = false;
+                }
+            }
 	   
 	   
 	   public void actualizarMovimiento() { 
@@ -84,7 +90,7 @@ public class Tarro {
 	    
 
 	public void destruir() {
-		    bucketImage.dispose();
+		  
 	   }
 	
    public boolean estaHerido() {
@@ -92,3 +98,4 @@ public class Tarro {
    }
 	   
 }
+
