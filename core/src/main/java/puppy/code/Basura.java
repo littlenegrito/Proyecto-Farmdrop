@@ -5,12 +5,13 @@
 package puppy.code;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
 
 public class Basura extends Peligros {
     private String nombre; // Nombre de la basura
 
-    public Basura(Texture textura, int velocidad, int daño, int efecto, String nombre) {
+    public Basura(TextureRegion textura, float velocidad, int daño, int efecto, String nombre) {
         super(textura, velocidad, daño, efecto);
         setNombre(nombre);
     }
@@ -24,7 +25,7 @@ public class Basura extends Peligros {
         return nombre;
     }
     @Override
-    public int obtenerVelocidad() {
+    public float obtenerVelocidad() {
         return velocidad;
     }
     @Override
@@ -35,8 +36,9 @@ public class Basura extends Peligros {
 
     @Override
     public void activarEfecto(Tarro tarro) {
-        // Implementar cómo la basura afecta al jugador. Por ejemplo:
-        //tarro.modificarVida(daño); // Supongamos que el Tarro tiene un método para perder vida
+        System.out.println("Jugador dañado" + obtenerDaño());
+        int vidaActual = tarro.getVidas();
+        tarro.dañar(vidaActual); // instakill
     }
     @Override
     public void reiniciar(){ // Lógica personalizada para reiniciar un alimento

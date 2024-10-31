@@ -5,21 +5,22 @@
 package puppy.code;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
 public abstract class Alimentos implements Accionable {
     protected int puntos;
     protected int vida;
-    protected int velocidad;
+    protected float velocidad;
     
-    protected Texture textura;
+    protected TextureRegion textura;
     protected Rectangle area;
     protected int efecto;
     
-    public Alimentos(Texture textura, int velocidad, int vida) {
-        setVida(vida);   // Encapsulado con setter
-        setTextura(textura);   // Encapsulado con setter
-        setVelocidad(velocidad);  // Encapsulado con setter
-        this.area = new Rectangle(MathUtils.random(0, 800 - 64), 480, 64, 64); // Rectángulo del área
+   public Alimentos(TextureRegion textura, float velocidad, int vida) {
+        setVida(vida); // Encapsulado con setter
+        setTextura(textura); // Encapsulado con setter
+        setVelocidad(velocidad); // Encapsulado con setter
+        this.area = new Rectangle(MathUtils.random(0, 1600 - textura.getRegionWidth()), 960, textura.getRegionWidth(), textura.getRegionHeight());
     }
     //
     // Metodos interfaces
@@ -36,6 +37,7 @@ public abstract class Alimentos implements Accionable {
     
     @Override
     public boolean esRecogido(Rectangle tarroArea) {
+        System.out.println("Se recogio un alimento");
         return area.overlaps(tarroArea);
     }
 
@@ -44,9 +46,10 @@ public abstract class Alimentos implements Accionable {
         // Puedes implementar la lógica de eliminar o reciclar el elemento si es necesario.
     }
     @Override
-    public Texture obtenerTextura() {
+    public TextureRegion obtenerTextura() { // Cambiado a TextureRegion
         return textura; // Devolver la textura de la fruta
     }
+    public abstract float obtenerVelocidad(); 
     public abstract void activarEfecto(Tarro tarro);  // El método que define el efecto sobre el jugador
     //
     // Getters, abstractos
@@ -54,9 +57,7 @@ public abstract class Alimentos implements Accionable {
     public abstract int obtenerVida();
     public abstract int obtenerPuntaje();
     public abstract String obtenerNombre();
-    public abstract int obtenerVelocidad(); 
     public abstract String obtenerTipo();
-    
     public abstract void reiniciar(); // Restaura el estado del elemento a su condición inicial, útil para reciclar objetos en lugar de crear nuevos durante el juego.
     public abstract void aplicarModificador(float factor); // Ajusta temporalmente las propiedades del elemento, como aumentar su velocidad o efecto, en función de potenciadores o cambios en la dificultad.
     
@@ -83,11 +84,11 @@ public abstract class Alimentos implements Accionable {
         this.puntos = puntos;
     }
 
-    public void setTextura(Texture textura) {
+    public void setTextura(TextureRegion textura) {   
         this.textura = textura;
     }
 
-    public void setVelocidad(int velocidad) {
+    public void setVelocidad(float velocidad) {
         this.velocidad = velocidad;
     }
     public void setEfecto(int efecto){

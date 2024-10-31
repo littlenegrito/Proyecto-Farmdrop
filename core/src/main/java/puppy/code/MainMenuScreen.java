@@ -20,7 +20,7 @@ public class MainMenuScreen implements Screen {
         this.batch = game.getBatch();
         this.font = game.getFont();
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 800, 480);
+		 camera.setToOrtho(false, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 	}
 
 	@Override
@@ -32,8 +32,8 @@ public class MainMenuScreen implements Screen {
 
 		batch.begin();
 		font.getData().setScale(2, 2);
-		font.draw(batch, "Bienvenido a Recolecta Gotas!!! ", 100, camera.viewportHeight/2+50);
-		font.draw(batch, "Toca en cualquier lugar para comenzar!", 100, camera.viewportHeight/2-50);
+		font.draw(batch, "Bienvenido a Recolecta Gotas!!! ", 200, camera.viewportHeight/2+50);
+		font.draw(batch, "Toca en cualquier lugar para comenzar!", 200, camera.viewportHeight/2-50);
 
 		batch.end();
 
@@ -51,7 +51,7 @@ public class MainMenuScreen implements Screen {
 
 	@Override
 	public void resize(int width, int height) {
-		// TODO Auto-generated method stub
+            camera.setToOrtho(false, width, height);
 		
 	}
 

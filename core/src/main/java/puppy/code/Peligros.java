@@ -5,21 +5,22 @@
 package puppy.code;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
 
 public abstract class Peligros implements Accionable {
      protected int daño;
-     protected int velocidad;
-     protected Texture textura;
+     protected float velocidad;
+     protected TextureRegion textura;
      protected Rectangle area;
      protected int efecto;
 
-    public Peligros(Texture textura, int velocidad, int daño, int efecto) {
+    public Peligros(TextureRegion textura, float velocidad, int daño, int efecto) {
         setDaño(daño); // Encapsulado con setter
         setTextura(textura);   // Encapsulado con setter
         setVelocidad(velocidad);  // Encapsulado con setter
         setEfecto(efecto); // Encapsulado con setter
-        this.area = new Rectangle(MathUtils.random(0, 800 - 64), 480, 64, 64);
+        this.area = new Rectangle(MathUtils.random(0, 1600 - textura.getRegionWidth()), 960, textura.getRegionWidth(), textura.getRegionHeight());
     }
     //
     // Metodos interfaces
@@ -36,6 +37,7 @@ public abstract class Peligros implements Accionable {
     
     @Override
     public boolean esRecogido(Rectangle tarroArea) {
+        System.out.println("Se recogio un elemento dañino");
         return area.overlaps(tarroArea);
     }
 
@@ -44,9 +46,10 @@ public abstract class Peligros implements Accionable {
         // Puedes implementar la lógica de eliminar o reciclar el elemento si es necesario.
     }
     @Override
-    public Texture obtenerTextura() {
+    public TextureRegion obtenerTextura() { // Cambiado a TextureRegion
         return textura; // Devolver la textura de la fruta
     }
+    public abstract float obtenerVelocidad(); 
     public abstract void activarEfecto(Tarro tarro);  // El método que define el efecto sobre el jugador
     
     //
@@ -57,7 +60,6 @@ public abstract class Peligros implements Accionable {
     }
     public abstract int obtenerDaño();
     public abstract String obtenerNombre();
-    public abstract int obtenerVelocidad(); 
     public abstract String obtenerTipo();
     
     public abstract void reiniciar(); // Restaura el estado del elemento a su condición inicial, útil para reciclar objetos en lugar de crear nuevos durante el juego.
@@ -78,11 +80,11 @@ public abstract class Peligros implements Accionable {
     public void setDaño(int daño) {
         this.daño = daño;
     }
-    public void setTextura(Texture textura) {
+    public void setTextura(TextureRegion textura) { 
         this.textura = textura;
     }
 
-    public void setVelocidad(int velocidad) {
+    public void setVelocidad(float velocidad) {
         this.velocidad = velocidad;
     }
     public void setEfecto(int efecto){

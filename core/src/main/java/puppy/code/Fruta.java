@@ -5,10 +5,11 @@
 package puppy.code;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
 public class Fruta extends Alimentos {
     private String nombre;
-    public Fruta(Texture textura, int velocidad, int puntos, int vida, String nombre) { 
+    public Fruta(TextureRegion textura, float velocidad, int puntos, int vida, String nombre) { 
         super(textura, velocidad, vida); // Llama al constructor de la clase abstracta
         setNombre(nombre);            // Asigna el nombre a la instancia
         setPuntos(puntos);         // Asigna los puntos de la instancia
@@ -29,7 +30,7 @@ public class Fruta extends Alimentos {
         return nombre;
     }
     @Override
-    public int obtenerVelocidad() {
+    public float obtenerVelocidad() {
         return velocidad;
     }
     @Override
@@ -47,12 +48,12 @@ public class Fruta extends Alimentos {
     }
     @Override
     public void activarEfecto(Tarro tarro){ // Personalizar efectos aplicados a jugador
-        // Lógica para aplicar el efecto específico de la Fruta en el jugador
-        //tarro.modificarVida(vida);  // Ejemplo: aumentar la vida del jugador 
+        System.out.println("Suma de puntos: " + obtenerPuntaje());
+        tarro.sumarPuntos(obtenerPuntaje());
     }
     @Override
     public void aplicarModificador(float factor){ // Personalizar modificcador aplicado a puntaje
-         puntos *= factor;  // Ejemplo: modifica el puntaje de la fruta basado en un multiplicador
+        setPuntos((int) (puntos * factor));  // Modifica el puntaje según el factor dado 
     }
     public void setNombre(String nombre) {
         this.nombre = nombre;

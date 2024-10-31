@@ -5,6 +5,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.utils.Array;
@@ -14,12 +15,12 @@ public class Lluvia {
     private Array<Rectangle> rainDropsPos;
     private Array<Integer> rainDropsType;
     private long lastDropTime;
-    private Texture gotaBuena;
-    private Texture gotaMala;
+    private TextureRegion gotaBuena;
+    private TextureRegion gotaMala;
     private Sound dropSound;
     private Music rainMusic;
 	   
-	public Lluvia(Texture gotaBuena, Texture gotaMala, Sound ss, Music mm) {
+	public Lluvia(TextureRegion gotaBuena, TextureRegion gotaMala, Sound ss, Music mm) {
 		rainMusic = mm;
 		dropSound = ss;
 		this.gotaBuena = gotaBuena;
@@ -64,7 +65,7 @@ public class Lluvia {
 	      }
 	      if(raindrop.overlaps(tarro.getArea())) { //la gota choca con el tarro
 	    	if(rainDropsType.get(i)==1) { // gota dañina
-	    	  tarro.dañar();
+	    	  tarro.dañar(10);
 	    	  if (tarro.getVidas()<=0)
 	    		 return false; // si se queda sin vidas retorna falso /game over
 	    	  rainDropsPos.removeIndex(i);

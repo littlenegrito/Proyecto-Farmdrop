@@ -5,26 +5,31 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 
 
 public class Tarro {
 	   private Rectangle bucket;
-	   private Texture bucketImage;
+	   private TextureRegion bucketImage;
 	   private Sound sonidoHerido;
-	   private int vidas = 3;
+	   private int vidas = 100;
 	   private int puntos = 0;
 	   private int velx = 400;
 	   private boolean herido = false;
 	   private int tiempoHeridoMax=50;
 	   private int tiempoHerido;
-	   
-	   
-	   public Tarro(Texture tex, Sound ss) {
-		   bucketImage = tex;
-		   sonidoHerido = ss;
-	   }
+           
+           float scale = 0.15f;  // Cambia este valor para ajustar el tamaño
+           
+	   public Tarro(TextureRegion tex, Sound ss) {
+                this.bucketImage = tex;
+                if (this.bucketImage == null) {
+                    System.err.println("Error: La textura del tarro no se ha cargado correctamente.");
+                }
+                this.sonidoHerido = ss;
+            }
 	   
 		public int getVidas() {
 			return vidas;
@@ -39,31 +44,35 @@ public class Tarro {
 		public void sumarPuntos(int pp) {
 			puntos+=pp;
 		}
+                public void sumarVida(int vida) {
+			vidas+=vida;
+		}
 		
 	
 	   public void crear() {
-		      bucket = new Rectangle();
-		      bucket.x = 800 / 2 - 64 / 2;
-		      bucket.y = 20;
-		      bucket.width = 64;
-		      bucket.height = 64;
+		     bucket = new Rectangle();
+                    // Ajustar el ancho y la altura de acuerdo a la escala
+                    bucket.width = bucketImage.getRegionWidth() * scale;
+                    bucket.height = bucketImage.getRegionHeight() * scale;
+                    bucket.x = 1600 / 2 - bucket.width / 2; // Centrar el tarro
+                    bucket.y = 20; // Altura del tarro
+		   
 	   }
-	   public void dañar() {
-		  vidas--;
+	   public void dañar(int daño) {
+		  vidas-= daño;
 		  herido = true;
 		  tiempoHerido=tiempoHeridoMax;
 		  sonidoHerido.play();
 	   }
 	   public void dibujar(SpriteBatch batch) {
-		 if (!herido)  
-		   batch.draw(bucketImage, bucket.x, bucket.y);
-		 else {
-		
-		   batch.draw(bucketImage, bucket.x, bucket.y+ MathUtils.random(-5,5));
-		   tiempoHerido--;
-		   if (tiempoHerido<=0) herido = false;
-		 }
-	   } 
+                if (!herido) {
+                    batch.draw(bucketImage, bucket.x, bucket.y, bucket.width, bucket.height);
+                } else {
+                    batch.draw(bucketImage, bucket.x, bucket.y + MathUtils.random(-5, 5), bucket.width, bucket.height);
+                    tiempoHerido--;
+                    if (tiempoHerido <= 0) herido = false;
+                }
+            }
 	   
 	   
 	   public void actualizarMovimiento() { 
@@ -79,12 +88,12 @@ public class Tarro {
 		   if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) bucket.x += velx * Gdx.graphics.getDeltaTime();
 		   // que no se salga de los bordes izq y der
 		   if(bucket.x < 0) bucket.x = 0;
-		   if(bucket.x > 800 - 64) bucket.x = 800 - 64;
+		   if(bucket.x > 1600 - bucket.width) bucket.x = 1600 - bucket.width;
 	   }
 	    
 
 	public void destruir() {
-		    bucketImage.dispose();
+		  
 	   }
 	
    public boolean estaHerido() {

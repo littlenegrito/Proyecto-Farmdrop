@@ -5,11 +5,12 @@
 package puppy.code;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.*;
 
 public class Vegetal extends Alimentos {
     private String nombre;
-    public Vegetal(Texture textura, int velocidad, int puntos, int vida, String nombre) {
+    public Vegetal(TextureRegion textura, float velocidad, int puntos, int vida, String nombre) {
         super(textura, velocidad, vida);  // Usa el constructor de la clase abstracta Alimentos
         setNombre(nombre);
         setPuntos(puntos);  // Usamos el setter para asignar puntos por defecto a los vegetales
@@ -30,7 +31,7 @@ public class Vegetal extends Alimentos {
         return nombre;
     }
     @Override
-    public int obtenerVelocidad() {
+    public float obtenerVelocidad() {
         return velocidad;
     }
     @Override
@@ -46,7 +47,11 @@ public class Vegetal extends Alimentos {
       setPuntos(15);  // Reinicia el puntaje del vegetal
     }
     public void activarEfecto(Tarro tarro){ // Personalizar efectos aplicados a jugador
-        //tarro.modificarVida(vida);  // Aplica el efecto de recuperar vida al tarro (jugador)
+        aplicarModificador(3); // Multiplicador de puntos
+        System.out.println("Suma de puntos: " + obtenerPuntaje());
+        tarro.sumarPuntos(obtenerPuntaje());
+        System.out.println("Suma de vida: " + obtenerVida());
+        tarro.sumarVida(obtenerVida());
     }
 
     public void aplicarModificador(float factor){ // Personalizar modificcador aplicado a puntaje
