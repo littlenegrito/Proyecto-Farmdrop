@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package puppy.code;
 
 import com.badlogic.gdx.Gdx;
@@ -69,12 +73,19 @@ public class Tarro {
                     batch.draw(bucketImage, bucket.x, bucket.y, bucket.width, bucket.height);
                 } else {
                     batch.draw(bucketImage, bucket.x, bucket.y + MathUtils.random(-5, 5), bucket.width, bucket.height);
+                float scale = 0.2f;  // Cambia este valor para ajustar el tamaño
+                float tarroWidth = bucketImage.getRegionWidth() * scale;
+                float tarroHeight = bucketImage.getRegionHeight() * scale;
+
+                if (!herido) {
+                    batch.draw(bucketImage, bucket.x, bucket.y, tarroWidth, tarroHeight);
+                } else {
+                    batch.draw(bucketImage, bucket.x, bucket.y + MathUtils.random(-5, 5), tarroWidth, tarroHeight);
                     tiempoHerido--;
                     if (tiempoHerido <= 0) herido = false;
                 }
             }
-	   
-	   
+           }
 	   public void actualizarMovimiento() { 
 		   // movimiento desde mouse/touch
 		   /*if(Gdx.input.isTouched()) {

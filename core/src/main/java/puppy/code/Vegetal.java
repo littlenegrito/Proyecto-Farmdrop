@@ -50,8 +50,14 @@ public class Vegetal extends Alimentos {
         aplicarModificador(3); // Multiplicador de puntos
         System.out.println("Suma de puntos: " + obtenerPuntaje());
         tarro.sumarPuntos(obtenerPuntaje());
-        System.out.println("Suma de vida: " + obtenerVida());
-        tarro.sumarVida(obtenerVida());
+        int vidaActual = tarro.getVidas();
+        int vidaARecuperar = obtenerVida(); // Vida que el vegetal intenta curar
+        if(vida < 100){ // limitar puntos de vida
+            int vidaFaltante = 100 - vidaActual; // Cantidad de vida para alcanzar el máximo de 100
+            int vidaASumar = Math.min(vidaARecuperar, vidaFaltante); 
+            System.out.println("Suma de vida: " + vidaASumar);
+            tarro.sumarVida(vidaASumar); 
+        }
     }
 
     public void aplicarModificador(float factor){ // Personalizar modificcador aplicado a puntaje

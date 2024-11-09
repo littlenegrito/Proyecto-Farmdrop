@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package puppy.code;
 
 import com.badlogic.gdx.Game;
@@ -18,6 +22,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
                         font = new BitmapFont(); // Usamos la fuente predeterminada de LibGDX
                         atlas = new TextureAtlas(Gdx.files.internal("output/imagenesAtlas.atlas")); // acceder a las texturas generadas
                         Gdx.graphics.setWindowedMode(1600, 960); // Tamaño base
+
                         this.setScreen(new MainMenuScreen(this));
 		}
 

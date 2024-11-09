@@ -21,6 +21,7 @@ public class GameScreen implements Screen {
     private Entorno entorno;
     private Lluvia lluvia;
     
+    
     public GameScreen(final GameLluviaMenu game) {
         this.game = game;
         this.batch = game.getBatch();
@@ -36,24 +37,18 @@ public class GameScreen implements Screen {
             System.out.println(region.name);
         }
         
-
         // Crear tarro del jugador
         tarro = new Tarro(game.getAtlas().findRegion("basket"), hurtSound);
-        
-        //TextureRegion gota = game.getAtlas().findRegion("drop");
-        //TextureRegion gotaMala = game.getAtlas().findRegion("dropBad");
-        
+  
         // Crear el entorno de juego (elementos como frutas, peligros, etc.)
-        //lluvia = new Lluvia(gota, gotaMala, dropSound, rainMusic);
         entorno = new Entorno(game.getAtlas(),dropSound, rainMusic);
 
         // camera
 	camera = new OrthographicCamera();
-	batch = new SpriteBatch();
-        
-        // creacion de objetos
+        camera.setToOrtho(false, 1600, 960);
+        batch = new SpriteBatch();
+    
         tarro.crear();
-        //lluvia.crear();
         entorno.crear();
     }
 
@@ -82,11 +77,11 @@ public class GameScreen implements Screen {
                 game.setScreen(new GameOverScreen(game));
                 dispose();
             }
+            // Llamar a actualizarDificultad con los puntos actuales del tarro
+            entorno.actualizarDificultad(tarro.getPuntos());
         }
-
         // Dibujar el tarro y los elementos
         tarro.dibujar(batch);
-        //lluvia.actualizarDibujoLluvia(batch);
         entorno.actualizarDibujo(batch);
 
         batch.end();
@@ -97,7 +92,6 @@ public class GameScreen implements Screen {
     }
     @Override
     public void show() {
-        //lluvia.continuar();
         entorno.continuar();
     }
     @Override
@@ -106,7 +100,6 @@ public class GameScreen implements Screen {
 
     @Override
     public void pause() {
-        //lluvia.pausar();
         entorno.pausar();
         game.setScreen(new PausaScreen(game, this));
     }
@@ -117,8 +110,8 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
         tarro.destruir();
-        //lluvia.destruir();
         entorno.destruir();
     }
 
 }
+

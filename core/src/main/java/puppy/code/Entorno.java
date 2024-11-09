@@ -18,17 +18,37 @@ import com.badlogic.gdx.audio.Sound;
 public class Entorno {
     private Array<Accionable> elementos;
     private Array<Rectangle> elementosPos;
-    private float escala = 0.1f; // Factor de escala para los elementos
+    private float escala = 0.1f; // Factor de escala para la textura de los elementos 
     
     private long lastDropTime;
+    private long lastUpdateDifficultyTime; // Medida para controlar dificultad
     private Sound dropSound;
     private Music rainMusic;
-    private TextureAtlas atlas; 
+    private TextureAtlas atlas;
+    
+    // Variables de dificultad iniciales
+    private float velocidadBase = 175.0f;
+    private int puntajeBaseFruta = 3;
+    private int puntajeBaseVegetal = 5;
+    private int danioBaseChatarra = 10;
+    private int curacionBaseVegetal = 2;
+    
+     // Factores de incremento
+    private float incrementoVelocidad = 10f; // Incremento por cada umbral
+    private int incrementoDaño = 1;
+    private int decrementoCuracion = 1;
+    private int incrementoPuntajeFruta = 2;
+    private int incrementoPuntajeVegetal = 1;
+    
+     // Umbrales de puntuación para aumentar dificultad
+    private int umbralPuntos = 50; // Cada 100 puntos aumenta dificultad
+    private int puntosAlcanzados = 0;
 
      public Entorno(TextureAtlas atlas, Sound dropSound, Music rainMusic) {
         this.atlas = atlas;
         this.dropSound = dropSound;
         this.rainMusic = rainMusic;
+        this.lastUpdateDifficultyTime = TimeUtils.nanoTime();
     }
     public void crear() {
         elementos = new Array<>();
@@ -37,8 +57,26 @@ public class Entorno {
         rainMusic.setLooping(true);
 	rainMusic.play();
     }
-
+    
+public void actualizarDificultad(int puntos) {
+        // Determina cuántos umbrales se han alcanzado
+        int nuevosUmbrales = puntos / umbralPuntos;
+        if (nuevosUmbrales > puntosAlcanzados / umbralPuntos) {
+            // Aumentar dificultad
+            velocidadBase += incrementoVelocidad;
+            if(danioBaseChatarra<25) danioBaseChatarra += incrementoDaño;
+            if(curacionBaseVegetal<10) curacionBaseVegetal = Math.max(curacionBaseVegetal - decrementoCuracion, 1); // Evita que sea 0
+            puntajeBaseFruta += incrementoPuntajeFruta;
+            puntajeBaseVegetal += incrementoPuntajeVegetal;
+            
+            puntosAlcanzados = puntos; // Actualizar puntos alcanzados
+            System.out.println("Dificultad aumentada! Velocidad: " + velocidadBase + ", Daño Chatarra: " + danioBaseChatarra + ", Curación Vegetal: " + curacionBaseVegetal + ", Puntaje Fruta: " + puntajeBaseFruta + ", Puntaje Vegetal: " + puntajeBaseVegetal);
+        }
+        else System.out.println("No se cruza el umbral");
+    }
+    
    private void crearElemento() {
+            ElementoFactory factory = seleccionarFactory(); // utilizar patron factory
             float anchoOriginal = atlas.findRegion("pizza").getRegionWidth() * escala;
             float altoOriginal = atlas.findRegion("pizza").getRegionHeight() * escala;
 
@@ -51,22 +89,14 @@ public class Entorno {
             );
             System.out.println("Creando elemento en posición: " + elementoPos);
            
-            Accionable nuevoElemento; // crear la interfaz para asignarle un tipo de elemento
-            int tipoElemento = MathUtils.random(1, 10); // Determina el tipo de elemento basado en probabilidades
-            
-            // Generar aleatoriamente un elemento bueno o malo
-            if (tipoElemento <= 4) { // 40% de probabilidad para fruta
-                 nuevoElemento = new Fruta(atlas.findRegion(seleccionarTexturaFruta()), 200, 5, 5, "Fruta");
-            } else if (tipoElemento <= 7) { // 20% de probabilidad para vegetales
-                nuevoElemento = new Chatarra(atlas.findRegion(seleccionarTexturaChatarra()), 175, 5, 1, "Chatarra");
-            } else if (tipoElemento <= 9) { // 30% de probabilidad para chatarra
-                nuevoElemento = new Vegetal(atlas.findRegion(seleccionarTexturaVegetal()), 300, 3, 10, "Vegetal");
-            } else { // |0% de probabilidad para basura
-                nuevoElemento = new Basura(atlas.findRegion(seleccionarTexturaBasura()), 150, 10, 2, "Basura");
-            }
+            Accionable nuevoElemento = factory.crearElemento(atlas, velocidadBase, obtenerPuntajeBase(factory), obtenerEfectoBase(factory)); // crear la interfaz para asignarle un tipo de elemento
             // Añadir el nuevo elemento al arreglo
-            elementos.add(nuevoElemento);
-            elementosPos.add(elementoPos);
+            if (nuevoElemento != null){
+                elementos.add(nuevoElemento);
+                elementosPos.add(elementoPos);
+            }else System.out.println("Error al crear objeto");
+            
+            
             lastDropTime = TimeUtils.nanoTime();
     }
     public boolean actualizarMovimiento(Tarro tarro){
@@ -80,7 +110,6 @@ public class Entorno {
            elementoPos.y -= velocidad * Gdx.graphics.getDeltaTime(); // Aplicar la velocidad del elemento
 
            elemento.moverElemento(Gdx.graphics.getDeltaTime()); // Llamada a moverElemento()
-
            // Verificar si el elemento ha caido al suelo
            if (elementoPos.y + elementoPos.height < 0) { // Si cae fuera de la pantalla
                 elemento.desaparecer();
@@ -93,11 +122,10 @@ public class Entorno {
                System.out.println("Aplicar efecto");
                elemento.activarEfecto(tarro);
                dropSound.play();
-               // Remover el elemento tras la colisión
                elementos.removeIndex(i);
                elementosPos.removeIndex(i);
                i--;
-           }
+           }         
         }
         return tarro.getVidas() > 0;
     }
@@ -114,13 +142,32 @@ public class Entorno {
             float altoOriginal = textura.getRegionHeight();
 
             // Dibujar la textura correspondiente
-           if (textura != null) {
-                batch.draw(textura, elementoPos.x, elementoPos.y, anchoOriginal * escala, altoOriginal * escala);
-            }
-           else{
-               System.out.println("No se encontro textura");
-           }
+           if (textura != null) batch.draw(textura, elementoPos.x, elementoPos.y, anchoOriginal * escala, altoOriginal * escala);
+           else System.out.println("No se encontro textura");
         }    
+    }
+    
+    private ElementoFactory seleccionarFactory() { // Distribuir la generación de elementos
+        int tipoElemento = MathUtils.random(1, 10);
+        if (tipoElemento <= 4) return new FrutaFactory();
+        else if (tipoElemento <= 7) return new VegetalFactory();
+        else if (tipoElemento <= 9) return new ChatarraFactory();
+        else return new BasuraFactory();
+    }
+
+    private int obtenerPuntajeBase(ElementoFactory factory) {
+        if (factory instanceof FrutaFactory) return puntajeBaseFruta;
+        if (factory instanceof VegetalFactory) return puntajeBaseVegetal;
+        if (factory instanceof ChatarraFactory) return danioBaseChatarra;
+        if (factory instanceof BasuraFactory) return danioBaseChatarra;
+        return 0;
+    }
+    
+    private int obtenerEfectoBase(ElementoFactory factory) {
+        if (factory instanceof VegetalFactory) return curacionBaseVegetal;
+        if (factory instanceof ChatarraFactory) return 1; // efecto de prueba
+        if (factory instanceof BasuraFactory) return 2; // efecto de prueba
+        return 0;
     }
     public void destruir() {
         dropSound.dispose();
@@ -133,75 +180,6 @@ public class Entorno {
 
     public void continuar() {
         rainMusic.play();
-    }
-    
-    private String seleccionarTexturaFruta() {
-        int tipoFruta = MathUtils.random(1, 5); // 1 a 5 para frutas diferentes
-        switch (tipoFruta) {
-            case 1:
-                return "apple"; // Usa el nombre del atlas, sin la extensión
-            case 2:
-                return "banana";
-            case 3:
-                return "orange";
-            case 4:
-                return "strawberry";
-            case 5:
-                return "cherry";
-            default:
-                return "apple"; // Valor por defecto
-        }
-    }
-    private String seleccionarTexturaVegetal() {
-        int tipoVegetal = MathUtils.random(1, 5); // 1 a 5 para vegetales diferentes
-        switch (tipoVegetal) {
-            case 1:
-                return "tomato"; 
-            case 2:
-                return "broccoli";
-            case 3:
-                return "pumpkin";
-            case 4:
-                return "carrot";
-            case 5:
-                return "corn";
-            default:
-                return "tomato"; // Valor por defecto
-        }
-    }
-    private String seleccionarTexturaBasura() {
-        int tipoBasura = MathUtils.random(1, 5); // 1 a 5 para basuras diferentes
-        switch (tipoBasura) {
-            case 1:
-                return "trash"; // Asegúrate de que la ruta sea correcta
-            case 2:
-                return "trash";
-            case 3:
-                return "trash";
-            case 4:
-                return "trash";
-            case 5:
-                return "trash";
-            default:
-                return "trash"; // Valor por defecto
-        }
-    }
-    private String seleccionarTexturaChatarra() {
-    int tipoChatarra = MathUtils.random(1, 5); // 1 a 5 para chatarras diferentes
-        switch (tipoChatarra) {
-            case 1:
-                return "pizza"; 
-            case 2:
-                return "pollo";
-            case 3:
-                return "burger";
-            case 4:
-                return "milkshake";
-            case 5:
-                return "taco";
-            default:
-                return "pizza"; // Valor por defecto
-        }
     }
 }
 
