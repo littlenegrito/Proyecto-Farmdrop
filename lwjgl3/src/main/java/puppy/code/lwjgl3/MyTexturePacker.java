@@ -9,11 +9,13 @@ import java.io.File;
 public class MyTexturePacker {
     public static void packTextures() {
         TexturePacker.Settings settings = new TexturePacker.Settings();
-        settings.maxWidth = 1024;
-        settings.maxHeight = 1024;
-        settings.duplicatePadding = true;      // Evita problemas de bordes en las texturas
-        settings.minWidth = 1;                 // Ancho mínimo de texturas a empaquetar
-        settings.minHeight = 1;                // Alto mínimo de texturas a empaquetar
+        settings.maxWidth = 2048;  // Aumenta el ancho máximo de la página
+        settings.maxHeight = 2048; // Aumenta el alto máximo de la página
+        settings.duplicatePadding = false; // Elimina el padding duplicado
+        settings.paddingX = 0; // Ajusta padding en X
+        settings.paddingY = 0; // Ajusta padding en Y
+        settings.minWidth = 1;
+        settings.minHeight = 1;
 
 
         String inputDir = "C:\\Users\\Acer\\Downloads\\Proyecto-FarmDrop\\assets\\input";// Reemplaza con la ruta a tus texturas de entrada.
