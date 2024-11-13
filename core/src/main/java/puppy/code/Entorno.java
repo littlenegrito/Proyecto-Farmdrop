@@ -21,7 +21,6 @@ public class Entorno {
     private float escala = 0.1f; // Factor de escala para la textura de los elementos 
     
     private long lastDropTime;
-    private long lastUpdateDifficultyTime; // Medida para controlar dificultad
     private Sound dropSound;
     private Music rainMusic;
     private TextureAtlas atlas;
@@ -41,14 +40,13 @@ public class Entorno {
     private int incrementoPuntajeVegetal = 1;
     
      // Umbrales de puntuación para aumentar dificultad
-    private int umbralPuntos = 50; // Cada 100 puntos aumenta dificultad
+    private int umbralPuntos = 250; // Cada ciertos puntos aumenta dificultad
     private int puntosAlcanzados = 0;
 
      public Entorno(TextureAtlas atlas, Sound dropSound, Music rainMusic) {
         this.atlas = atlas;
         this.dropSound = dropSound;
         this.rainMusic = rainMusic;
-        this.lastUpdateDifficultyTime = TimeUtils.nanoTime();
     }
     public void crear() {
         elementos = new Array<>();
@@ -70,9 +68,8 @@ public void actualizarDificultad(int puntos) {
             puntajeBaseVegetal += incrementoPuntajeVegetal;
             
             puntosAlcanzados = puntos; // Actualizar puntos alcanzados
-            System.out.println("Dificultad aumentada! Velocidad: " + velocidadBase + ", Daño Chatarra: " + danioBaseChatarra + ", Curación Vegetal: " + curacionBaseVegetal + ", Puntaje Fruta: " + puntajeBaseFruta + ", Puntaje Vegetal: " + puntajeBaseVegetal);
+            System.out.println("Dificultad aumentada! Velocid Basead: " + velocidadBase + ", Daño Chatarra: " + danioBaseChatarra + ", Curación Vegetal: " + curacionBaseVegetal + ", Puntaje Fruta: " + puntajeBaseFruta + ", Puntaje Vegetal: " + puntajeBaseVegetal);
         }
-        else System.out.println("No se cruza el umbral");
     }
     
    private void crearElemento() {
@@ -89,7 +86,7 @@ public void actualizarDificultad(int puntos) {
             );
             System.out.println("Creando elemento en posición: " + elementoPos);
            
-            Accionable nuevoElemento = factory.crearElemento(atlas, velocidadBase, obtenerPuntajeBase(factory), obtenerEfectoBase(factory)); // crear la interfaz para asignarle un tipo de elemento
+            Accionable nuevoElemento = factory.crearElemento(atlas, obtenerVelocidadBase(factory), obtenerPuntajeBase(factory), obtenerEfectoBase(factory)); // crear la interfaz para asignarle un tipo de elemento
             // Añadir el nuevo elemento al arreglo
             if (nuevoElemento != null){
                 elementos.add(nuevoElemento);
@@ -153,6 +150,12 @@ public void actualizarDificultad(int puntos) {
         else if (tipoElemento <= 7) return new VegetalFactory();
         else if (tipoElemento <= 9) return new ChatarraFactory();
         else return new BasuraFactory();
+    }
+    
+    private float obtenerVelocidadBase(ElementoFactory factory) {
+        if (factory instanceof VegetalFactory) return (float) (velocidadBase * 1.5);
+        if (factory instanceof BasuraFactory) return (float) (velocidadBase * 0.9);
+        return velocidadBase;
     }
 
     private int obtenerPuntajeBase(ElementoFactory factory) {
