@@ -18,7 +18,7 @@ import com.badlogic.gdx.audio.Sound;
 public class Entorno {
     private Array<Accionable> elementos;
     private Array<Rectangle> elementosPos;
-    private float escala = 0.1f; // Factor de escala para la textura de los elementos 
+    private float escala = 0.09f; // Factor de escala para la textura de los elementos 
     
     private long lastDropTime;
     private Sound dropSound;
@@ -38,10 +38,17 @@ public class Entorno {
     private int decrementoCuracion = 1;
     private int incrementoPuntajeFruta = 2;
     private int incrementoPuntajeVegetal = 1;
+    private long incrementoTiempoGeneracion = 100_000_000;
+    private long limiteTiempoGeneracion = 100_000_000;
     
      // Umbrales de puntuación para aumentar dificultad
     private int umbralPuntos = 250; // Cada ciertos puntos aumenta dificultad
     private int puntosAlcanzados = 0;
+    
+    // Parámetros de generación dinámica
+    private long tiempoGeneracionBase = 800_000_000; // Tiempo inicial en nanosegundos (0.8s)
+    private long tiempoGeneracionActual = tiempoGeneracionBase; // Tiempo variable entre elementos
+
 
      public Entorno(TextureAtlas atlas, Sound dropSound, Music rainMusic) {
         this.atlas = atlas;
@@ -57,25 +64,27 @@ public class Entorno {
     }
     
 public void actualizarDificultad(int puntos) {
-        // Determina cuántos umbrales se han alcanzado
         int nuevosUmbrales = puntos / umbralPuntos;
         if (nuevosUmbrales > puntosAlcanzados / umbralPuntos) {
             // Aumentar dificultad
             velocidadBase += incrementoVelocidad;
-            if(danioBaseChatarra<25) danioBaseChatarra += incrementoDaño;
-            if(curacionBaseVegetal<10) curacionBaseVegetal = Math.max(curacionBaseVegetal - decrementoCuracion, 1); // Evita que sea 0
+            if (danioBaseChatarra < 25) danioBaseChatarra += incrementoDaño;
+            if (curacionBaseVegetal < 20) curacionBaseVegetal = Math.max(curacionBaseVegetal - decrementoCuracion, 1);
             puntajeBaseFruta += incrementoPuntajeFruta;
             puntajeBaseVegetal += incrementoPuntajeVegetal;
             
-            puntosAlcanzados = puntos; // Actualizar puntos alcanzados
-            System.out.println("Dificultad aumentada! Velocid Basead: " + velocidadBase + ", Daño Chatarra: " + danioBaseChatarra + ", Curación Vegetal: " + curacionBaseVegetal + ", Puntaje Fruta: " + puntajeBaseFruta + ", Puntaje Vegetal: " + puntajeBaseVegetal);
+            // Reducir tiempo de generación para mayor frecuencia
+            tiempoGeneracionActual = Math.max(tiempoGeneracionActual - incrementoTiempoGeneracion, limiteTiempoGeneracion); 
+            
+            puntosAlcanzados = puntos;
+            System.out.println("Dificultad aumentada! Velocidad Base: " + velocidadBase + ", Daño Chatarra: " + danioBaseChatarra + ", Curación Vegetal: " + curacionBaseVegetal + ", Puntaje Fruta: " + puntajeBaseFruta + ", Puntaje Vegetal: " + puntajeBaseVegetal);
         }
     }
     
    private void crearElemento() {
             ElementoFactory factory = seleccionarFactory(); // utilizar patron factory
-            float anchoOriginal = atlas.findRegion("pizza").getRegionWidth() * escala;
-            float altoOriginal = atlas.findRegion("pizza").getRegionHeight() * escala;
+            float anchoOriginal = atlas.findRegion("apple").getRegionWidth() * escala;
+            float altoOriginal = atlas.findRegion("apple").getRegionHeight() * escala;
 
             // Generar la posición de los elementos asegurándose de que no salgan de la pantalla
             Rectangle elementoPos = new Rectangle(
@@ -97,8 +106,8 @@ public void actualizarDificultad(int puntos) {
             lastDropTime = TimeUtils.nanoTime();
     }
     public boolean actualizarMovimiento(Tarro tarro){
-        // Generar nuevos elementos si ha pasado suficiente tiempo
-       if (TimeUtils.nanoTime() - lastDropTime > 100000000) crearElemento();
+        // Generar nuevos elementos si ha pasado suficiente tiempo Dinamico
+       if (TimeUtils.nanoTime() - lastDropTime > tiempoGeneracionActual) crearElemento();
        // Actualizar la posición de los elementos
        for (int i = 0; i < elementosPos.size; i++) {
            Accionable elemento = elementos.get(i);
@@ -144,12 +153,37 @@ public void actualizarDificultad(int puntos) {
         }    
     }
     
-    private ElementoFactory seleccionarFactory() { // Distribuir la generación de elementos
-        int tipoElemento = MathUtils.random(1, 10);
-        if (tipoElemento <= 4) return new FrutaFactory();
-        else if (tipoElemento <= 7) return new VegetalFactory();
-        else if (tipoElemento <= 9) return new ChatarraFactory();
-        else return new BasuraFactory();
+    private ElementoFactory seleccionarFactory() {
+        int puntosEscalados = Math.min(puntosAlcanzados / umbralPuntos, 10); // Rango para limitar el cambio gradual de 0 a 10
+
+        // Probabilidades iniciales y límites de cambio
+        int probInicialFruta = 50;
+        int probInicialVegetal = 35;
+        int probInicialChatarra = 10;
+        int probInicialBasura = 5;
+
+        int probLimiteFruta = 40;
+        int probLimiteVegetal = 30;
+        int probLimiteChatarra = 20;
+        int probLimiteBasura = 10;
+
+        // Calcular la reducción proporcional de frutas y vegetales y el aumento de peligros
+        int probFruta = probInicialFruta - ((probInicialFruta - probLimiteFruta) * puntosEscalados / 10);
+        int probVegetal = probInicialVegetal - ((probInicialVegetal - probLimiteVegetal) * puntosEscalados / 10);
+        int probChatarra = probInicialChatarra + ((probLimiteChatarra - probInicialChatarra) * puntosEscalados / 10);
+        //int probBasura = probInicialBasura + ((probLimiteBasura - probInicialBasura) * puntosEscalados / 10);
+
+        int tipoElemento = MathUtils.random(1, 100);
+
+        if (tipoElemento <= probFruta) {
+            return new FrutaFactory();
+        } else if (tipoElemento <= probFruta + probVegetal) {
+            return new VegetalFactory();
+        } else if (tipoElemento <= probFruta + probVegetal + probChatarra) {
+            return new ChatarraFactory();
+        } else {
+            return new BasuraFactory();
+        }
     }
     
     private float obtenerVelocidadBase(ElementoFactory factory) {
