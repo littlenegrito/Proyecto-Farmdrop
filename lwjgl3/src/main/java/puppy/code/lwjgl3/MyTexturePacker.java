@@ -18,8 +18,8 @@ public class MyTexturePacker {
         settings.minHeight = 1;
 
 
-        String inputDir = "C:\\Users\\Acer\\Downloads\\Proyecto-FarmDrop\\assets\\input";// Reemplaza con la ruta a tus texturas de entrada.
-        String outputDir = "C:\\Users\\Acer\\Downloads\\Proyecto-FarmDrop\\assets\\output"; // Reemplaza con la ruta donde quieres que se guarde el atlas.
+        String inputDir = "input";  // Carpeta relativa para texturas de entrada
+        String outputDir = "output"; // Carpeta relativa para el atlas de salida
         String atlasName = "imagenesAtlas"; // Reemplaza con el nombre deseado para el atlas.
         
         System.out.println("Ruta de entrada: " + inputDir);
