@@ -88,7 +88,7 @@ public void actualizarDificultad(int puntos) {
 
             // Generar la posición de los elementos asegurándose de que no salgan de la pantalla
             Rectangle elementoPos = new Rectangle(
-                MathUtils.random(0, 1600 - anchoOriginal), // Asegúrate de que el ancho esté escalado
+                MathUtils.random(0, 1920 - anchoOriginal), // Asegúrate de que el ancho esté escalado
                 960, // Mantener la posición vertical
                 anchoOriginal, // Ancho escalado
                 altoOriginal // Alto escalado

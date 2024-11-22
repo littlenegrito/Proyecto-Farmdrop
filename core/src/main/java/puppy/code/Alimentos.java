@@ -20,7 +20,7 @@ public abstract class Alimentos implements Accionable {
         setVida(vida); // Encapsulado con setter
         setTextura(textura); // Encapsulado con setter
         setVelocidad(velocidad); // Encapsulado con setter
-        this.area = new Rectangle(MathUtils.random(0, 1600 - textura.getRegionWidth()), 960, textura.getRegionWidth(), textura.getRegionHeight());
+        this.area = new Rectangle(MathUtils.random(0, 1920 - textura.getRegionWidth()), 960, textura.getRegionWidth(), textura.getRegionHeight());
     }
     //
     // Metodos interfaces

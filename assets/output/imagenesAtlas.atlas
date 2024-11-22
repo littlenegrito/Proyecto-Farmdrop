@@ -4,71 +4,100 @@ apple
 bounds:0,1024,1024,1024
 banana
 bounds:0,0,1024,1024
-broccoli
+basket
 bounds:1024,1024,1024,1024
-cake
+boost icon
 bounds:1024,0,1024,1024
 
 imagenesAtlas2.png
 size:2048,2048
-can
+boost icon deactivated
 bounds:0,1024,1024,1024
-carrot
+broccoli
 bounds:0,0,1024,1024
-cherry
+cake
 bounds:1024,1024,1024,1024
-corn
+can
 bounds:1024,0,1024,1024
 
 imagenesAtlas3.png
 size:2048,2048
-donut
+carrot
 bounds:0,1024,1024,1024
-golden_apple
+cherry
 bounds:0,0,1024,1024
-golden_broccoli
+corn
 bounds:1024,1024,1024,1024
-golden_cherry
+dash icon
 bounds:1024,0,1024,1024
 
 imagenesAtlas4.png
 size:2048,2048
-golden_peach
+dash icon deactivated
 bounds:0,1024,1024,1024
-golden_strawberry
+difficulty icon
 bounds:0,0,1024,1024
-golden_tomato
+donut
 bounds:1024,1024,1024,1024
-ice_cream
+golden_apple
 bounds:1024,0,1024,1024
 
 imagenesAtlas5.png
 size:2048,2048
-lemon
+golden_broccoli
 bounds:0,1024,1024,1024
-orange
+golden_cherry
 bounds:0,0,1024,1024
-paper
+golden_peach
 bounds:1024,1024,1024,1024
-peach
+golden_strawberry
 bounds:1024,0,1024,1024
 
 imagenesAtlas6.png
 size:2048,2048
-pizza
+golden_tomato
 bounds:0,1024,1024,1024
-pumpkin
+heal icon
 bounds:0,0,1024,1024
-strawberry
+healing icon
 bounds:1024,1024,1024,1024
-taco
+health icon deactivated
 bounds:1024,0,1024,1024
 
 imagenesAtlas7.png
 size:2048,2048
-basket
-bounds:1024,1536,512,512
-tomato
+ice_cream
 bounds:0,1024,1024,1024
+lemon
+bounds:0,0,1024,1024
+orange
+bounds:1024,1024,1024,1024
+paper
+bounds:1024,0,1024,1024
+
+imagenesAtlas8.png
+size:2048,2048
+peach
+bounds:0,1024,1024,1024
+pizza
+bounds:0,0,1024,1024
+pumpkin
+bounds:1024,1024,1024,1024
+shield icon
+bounds:1024,0,1024,1024
+
+imagenesAtlas9.png
+size:2048,2048
+shield icon deactivated
+bounds:0,1024,1024,1024
+strawberry
+bounds:0,0,1024,1024
+taco
+bounds:1024,1024,1024,1024
+tomato
+bounds:1024,0,1024,1024
+
+imagenesAtlas10.png
+size:1024,1024
 trash
 bounds:0,0,1024,1024

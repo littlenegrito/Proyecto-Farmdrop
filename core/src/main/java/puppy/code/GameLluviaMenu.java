@@ -21,7 +21,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 			batch = new SpriteBatch();
                         font = new BitmapFont(); // Usamos la fuente predeterminada de LibGDX
                         atlas = new TextureAtlas(Gdx.files.internal("output/imagenesAtlas.atlas")); // acceder a las texturas generadas
-                        Gdx.graphics.setWindowedMode(1600, 960); // Tamaño base
+                        Gdx.graphics.setWindowedMode(1920, 1080); // Tamaño base
 
                         this.setScreen(new MainMenuScreen(this));
 		}
