@@ -9,6 +9,7 @@ public class HabilidadCurar implements Habilidad {
     private int cooldown = 5; // Cooldown en segundos
     private String caracteristica = "Recupera una cantidad de vida al tarro.";
     private int cantidadCuracion = 20; // Cantidad de vida que se recupera
+    private long lastUsedTime = 0; // Tiempo en que se utilizó la habilidad por última vez
 
     // Constructor privado para evitar instanciación externa
     private HabilidadCurar() {}
@@ -34,6 +35,10 @@ public class HabilidadCurar implements Habilidad {
 
         tarro.sumarVida(nuevaVida - vidaActual); // Actualizar la vida del tarro
         System.out.println("Usando habilidad: " + nombre + ", recuperando " + cantidadCuracion + " de vida.");
+    }
+    @Override
+    public long getLastUsedTime() {
+        return lastUsedTime;
     }
 
     @Override

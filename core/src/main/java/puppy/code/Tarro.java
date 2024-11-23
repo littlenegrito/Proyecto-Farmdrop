@@ -30,18 +30,14 @@ public class Tarro {
            float scale = 0.15f;  // Cambia este valor para ajustar el tamaño
            
 	   public Tarro(TextureRegion tex, Sound ss) {
-                this.bucketImage = tex;
-                if (this.bucketImage == null) {
+               setTexture(tex);
+               if (this.bucketImage == null) {
                     System.err.println("Error: La textura del tarro no se ha cargado correctamente.");
                 }
-                this.sonidoHerido = ss;
+               this.bucket = new Rectangle(0, 20, 64, 64); // Inicializa el área del tarro
+               establecerHabilidad(HabilidadDash.obtenerInstancia());
+               this.sonidoHerido = ss;
             }
-		
-
-		public Tarro() {
-			this.habilidadActual = HabilidadDash.obtenerInstancia();
-			this.bucket = new Rectangle(0, 20, 64, 64); // Inicializa el área del tarro
-		}
 
 		public void usarHabilidad() {
 			if (habilidadActual != null) {
@@ -87,6 +83,13 @@ public class Tarro {
     	public float getVelx() {
         	return velx;
     	}
+        
+        public void setTexture(TextureRegion tex) {
+        if (tex == null) {
+            throw new IllegalArgumentException("La textura del tarro no puede ser nula");
+        }
+        this.bucketImage = tex;
+}
 		
 	
 	   public void crear() {
@@ -109,18 +112,18 @@ public class Tarro {
                     batch.draw(bucketImage, bucket.x, bucket.y, bucket.width, bucket.height);
                 } else {
                     batch.draw(bucketImage, bucket.x, bucket.y + MathUtils.random(-5, 5), bucket.width, bucket.height);
-                float scale = 0.2f;  // Cambia este valor para ajustar el tamaño
-                float tarroWidth = bucketImage.getRegionWidth() * scale;
-                float tarroHeight = bucketImage.getRegionHeight() * scale;
+                    float scale = 0.2f;  // Cambia este valor para ajustar el tamaño
+                    float tarroWidth = bucketImage.getRegionWidth() * scale;
+                    float tarroHeight = bucketImage.getRegionHeight() * scale;
 
-                if (!herido) {
-                    batch.draw(bucketImage, bucket.x, bucket.y, tarroWidth, tarroHeight);
-                } else {
-                    batch.draw(bucketImage, bucket.x, bucket.y + MathUtils.random(-5, 5), tarroWidth, tarroHeight);
-                    tiempoHerido--;
-                    if (tiempoHerido <= 0) herido = false;
+                    if (!herido) {
+                        batch.draw(bucketImage, bucket.x, bucket.y, tarroWidth, tarroHeight);
+                    } else {
+                        batch.draw(bucketImage, bucket.x, bucket.y + MathUtils.random(-5, 5), tarroWidth, tarroHeight);
+                        tiempoHerido--;
+                        if (tiempoHerido <= 0) herido = false;
+                    }
                 }
-            }
            }
 	   public void actualizarMovimiento() { 
 		   // movimiento desde mouse/touch

@@ -6,10 +6,11 @@ public class HabilidadBoostPuntaje implements Habilidad {
 
     // Atributos de la habilidad
     private String nombre = "Boost de Puntaje";
-    private int cooldown = 10; // Cooldown en segundos
+    private int cooldown = 15; // Cooldown en segundos
     private String caracteristica = "Aumenta temporalmente los puntos obtenidos.";
     private float duracion = 5.0f; // Duración del aumento en segundos
     private float factorAumento = 2.0f; // Factor por el que se aumentarán los puntos
+    private long lastUsedTime = 0;
 
     // Constructor privado para evitar instanciación externa
     private HabilidadBoostPuntaje() {}
@@ -23,6 +24,12 @@ public class HabilidadBoostPuntaje implements Habilidad {
 
     @Override
     public void usarHabilidad(Tarro tarro) {
+        long currentTime = System.currentTimeMillis();
+        if (currentTime - lastUsedTime < cooldown * 1000) {
+            System.out.println("Habilidad en cooldown. Espera " + ((cooldown * 1000 - (currentTime - lastUsedTime)) / 1000) + " segundos.");
+            return;
+        }
+        
         // Lógica para aumentar el puntaje
         System.out.println("Usando habilidad: " + nombre + ", los puntos obtenidos se multiplicarán por " + factorAumento + " durante " + duracion + " segundos.");
 
@@ -39,6 +46,12 @@ public class HabilidadBoostPuntaje implements Habilidad {
             tarro.resetFactorPuntaje(); // Restaura el factor de puntaje original
             System.out.println("El boost de puntaje ha terminado.");
         }).start();
+        lastUsedTime = currentTime;
+
+    }
+    @Override
+    public long getLastUsedTime() {
+        return lastUsedTime;
     }
 
     @Override

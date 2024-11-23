@@ -30,6 +30,9 @@ public class GameScreen implements Screen, InputProcessor {
         this.game = game;
         this.batch = game.getBatch();
         this.font = game.getFont();
+        
+        backgroundTexture = new Texture(Gdx.files.internal("background.jpg"));
+        bannerTexture = new Texture(Gdx.files.internal("banner.png"));
 
         // Inicializar sonidos
         Sound hurtSound = Gdx.audio.newSound(Gdx.files.internal("hurt.ogg"));
@@ -67,12 +70,6 @@ public class GameScreen implements Screen, InputProcessor {
         
          // Dibujar el fondo antes de otros elementos
         batch.draw(backgroundTexture, 0, 0, 1920, 1080);
-        
-         // Dibujar la puntuación y vidas (integración de ambas versiones)
-        font.getData().setScale(2.25f, 2.25f); // Cambiar tamaño del texto
-        font.draw(batch, "Puntos totales: " + tarro.getPuntos(), 200, camera.viewportHeight - 37);
-        font.draw(batch, "Vida: " + tarro.getVidas(), camera.viewportWidth - 160, camera.viewportHeight - 37);
-        font.draw(batch, "HighScore: " + game.getHigherScore(), 620, camera.viewportHeight - 37);
         
 
         if (!tarro.estaHerido()) {

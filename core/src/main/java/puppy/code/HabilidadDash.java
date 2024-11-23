@@ -5,6 +5,7 @@ public class HabilidadDash implements Habilidad {
     private String nombre = "Dash";
     private int cooldown = 3; // Cooldown en segundos
     private String caracteristica = "Permite al tarro esquivar peligros rápidamente.";
+    private long lastUsedTime = 0; // Para controlar el cooldown
 
     private HabilidadDash() {}
 
@@ -17,14 +18,28 @@ public class HabilidadDash implements Habilidad {
 
     @Override
     public void usarHabilidad(Tarro tarro) {
+        long currentTime = System.currentTimeMillis();
+        
+        // Verificar si el cooldown ha pasado
+        if (currentTime - lastUsedTime < cooldown * 1000) {
+            System.out.println("Habilidad en cooldown. Espera " + ((cooldown * 1000 - (currentTime - lastUsedTime)) / 1000) + " segundos.");
+            return;
+        }
+
         // Lógica para realizar el dash
         int dashDistance = 100; // Distancia del dash
         if (tarro.getVelx() > 0) { // Si se mueve hacia la derecha
             tarro.getArea().x += dashDistance; // Mover hacia la derecha
-        } else { // Si se mueve hacia la izquierda
+        } else if (tarro.getVelx() < 0) { // Si se mueve hacia la izquierda
             tarro.getArea().x -= dashDistance; // Mover hacia la izquierda
         }
+
+        lastUsedTime = currentTime; // Actualizar el tiempo de uso
         System.out.println("Usando habilidad: " + nombre);
+    }
+    @Override
+    public long getLastUsedTime() {
+        return lastUsedTime;
     }
 
     @Override
@@ -41,5 +56,4 @@ public class HabilidadDash implements Habilidad {
     public String obtenerCaracteristica() {
         return caracteristica;
     }
-    
 }
