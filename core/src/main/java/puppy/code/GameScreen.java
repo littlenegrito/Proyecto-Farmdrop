@@ -1,11 +1,12 @@
 package puppy.code;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -13,7 +14,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.ScreenUtils;
 
-public class GameScreen implements Screen {
+public class GameScreen implements Screen, InputProcessor {
     final GameLluviaMenu game;
     private OrthographicCamera camera;
     private SpriteBatch batch;
@@ -21,6 +22,8 @@ public class GameScreen implements Screen {
     private Tarro tarro;
     private Entorno entorno;
     private Lluvia lluvia;
+    private Texture backgroundTexture;
+    private Texture bannerTexture;
     
     
     public GameScreen(final GameLluviaMenu game) {
@@ -46,7 +49,7 @@ public class GameScreen implements Screen {
 
         // camera
 	camera = new OrthographicCamera();
-        camera.setToOrtho(false, 1600, 960);
+        camera.setToOrtho(false, 1920, 1080);
         batch = new SpriteBatch();
     
         tarro.crear();
@@ -61,10 +64,16 @@ public class GameScreen implements Screen {
         //actualizar 
         batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        // Dibujar la puntuación y vidas
-        font.draw(batch, "Puntos totales: " + tarro.getPuntos(), 5, camera.viewportHeight - 5);
-        font.draw(batch, "Vida : " + tarro.getVidas(), camera.viewportWidth - 130, camera.viewportHeight - 5);
-        font.draw(batch, "HighScore : " + game.getHigherScore(), camera.viewportWidth / 2 - 50, camera.viewportHeight - 5);
+        
+         // Dibujar el fondo antes de otros elementos
+        batch.draw(backgroundTexture, 0, 0, 1920, 1080);
+        
+         // Dibujar la puntuación y vidas (integración de ambas versiones)
+        font.getData().setScale(2.25f, 2.25f); // Cambiar tamaño del texto
+        font.draw(batch, "Puntos totales: " + tarro.getPuntos(), 200, camera.viewportHeight - 37);
+        font.draw(batch, "Vida: " + tarro.getVidas(), camera.viewportWidth - 160, camera.viewportHeight - 37);
+        font.draw(batch, "HighScore: " + game.getHigherScore(), 620, camera.viewportHeight - 37);
+        
 
         if (!tarro.estaHerido()) {
             // Actualizar movimiento del tarro
@@ -85,11 +94,7 @@ public class GameScreen implements Screen {
             tarro.establecerHabilidad(HabilidadDash.obtenerInstancia());
             tarro.usarHabilidad();
         }
-        long currentTime = System.currentTimeMillis();
-        if (currentTime - tarro.getHabilidadActual().getLastUsedTime() < tarro.getHabilidadActual().obtenerCooldown() * 1000) {
-            float timeRemaining = tarro.getHabilidadActual().obtenerCooldown() - (currentTime - tarro.getHabilidadActual().getLastUsedTime()) / 1000.0f;
-            font.draw(batch, "Dash en cooldown: " + Math.ceil(timeRemaining), 5, camera.viewportHeight - 25);
-        }
+        
         if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
             tarro.establecerHabilidad(HabilidadCurar.obtenerInstancia()); // Establecer la habilidad de curar
             tarro.usarHabilidad(); 
@@ -98,10 +103,26 @@ public class GameScreen implements Screen {
             tarro.establecerHabilidad(HabilidadBoostPuntaje.obtenerInstancia()); // Establecer la habilidad Boost de Puntaje
             tarro.usarHabilidad();
         }
+        
+        // Mostrar cooldown de la habilidad activa
+        long currentTime = System.currentTimeMillis();
+        if (tarro.getHabilidadActual() != null && currentTime - tarro.getHabilidadActual().getLastUsedTime() < tarro.getHabilidadActual().obtenerCooldown() * 1000) {
+            float timeRemaining = tarro.getHabilidadActual().obtenerCooldown() - (currentTime - tarro.getHabilidadActual().getLastUsedTime()) / 1000.0f;
+            font.draw(batch, "Cooldown: " + Math.ceil(timeRemaining) + "s", 5, camera.viewportHeight - 25);
+        }
     
         // Dibujar el tarro y los elementos
         tarro.dibujar(batch);
         entorno.actualizarDibujo(batch);
+        
+        batch.draw(bannerTexture, 0, -20, 1920, 1080);
+        
+        font.getData().setScale(2.25f, 2.25f); // Cambiar tamaño del texto
+        
+        // Dibujar la puntuación y vidas
+        font.draw(batch, "" + tarro.getPuntos(), 200, camera.viewportHeight - 37);
+        font.draw(batch, "" + tarro.getVidas(), camera.viewportWidth - 160, camera.viewportHeight - 37);
+        font.draw(batch, "" + game.getHigherScore(), 620, camera.viewportHeight - 37);
 
         batch.end();
     }
@@ -112,6 +133,7 @@ public class GameScreen implements Screen {
     @Override
     public void show() {
         entorno.continuar();
+        Gdx.input.setInputProcessor(this);  // Activa el InputProcessor de la pantalla de juego
     }
     @Override
     public void hide() {
@@ -126,11 +148,24 @@ public class GameScreen implements Screen {
     public void resume() {
     }
 
-    @Override
+     @Override
     public void dispose() {
         tarro.destruir();
         entorno.destruir();
+        backgroundTexture.dispose();
+        bannerTexture.dispose();
     }
+    
+        // Métodos no utilizados de InputProcessor
+        @Override public boolean keyDown(int keycode) { return false; }
+        @Override public boolean keyUp(int keycode) { return false; }
+        @Override public boolean keyTyped(char character) { return false; }
+        @Override public boolean touchUp(int screenX, int screenY, int pointer, int button) { return false; }
+        @Override public boolean touchDown(int screenX, int screenY, int pointer, int button) { return false; }
+        @Override public boolean touchDragged(int screenX, int screenY, int pointer) { return false; }
+        @Override public boolean mouseMoved(int screenX, int screenY) { return false; }
+        @Override public boolean scrolled(float amountX, float amountY) { return false; }
+        @Override public boolean touchCancelled(int screenX, int screenY, int pointer, int button) { return false; }
 
 }
 
