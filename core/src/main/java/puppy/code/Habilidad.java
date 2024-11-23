@@ -13,4 +13,5 @@ public interface Habilidad {
     String obtenerNombre();
     int  obtenerCooldown();
     String obtenerCaracteristica();
+    long getLastUsedTime();
 }

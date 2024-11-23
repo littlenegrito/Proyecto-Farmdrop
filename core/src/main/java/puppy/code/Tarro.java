@@ -69,6 +69,9 @@ public class Tarro {
 		public Rectangle getArea() {
 			return bucket;
 		}
+                public Habilidad getHabilidadActual(){
+                    return habilidadActual;
+                }
 		public void sumarPuntos(int pp) {
 			puntos+=pp;
 		}
@@ -91,7 +94,7 @@ public class Tarro {
                     // Ajustar el ancho y la altura de acuerdo a la escala
                     bucket.width = bucketImage.getRegionWidth() * scale;
                     bucket.height = bucketImage.getRegionHeight() * scale;
-                    bucket.x = 1600 / 2 - bucket.width / 2; // Centrar el tarro
+                    bucket.x = 1920 / 2 - bucket.width / 2; // Centrar el tarro
                     bucket.y = 20; // Altura del tarro
 		   
 	   }
@@ -132,7 +135,7 @@ public class Tarro {
 		   if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) bucket.x += velx * Gdx.graphics.getDeltaTime();
 		   // que no se salga de los bordes izq y der
 		   if(bucket.x < 0) bucket.x = 0;
-		   if(bucket.x > 1600 - bucket.width) bucket.x = 1600 - bucket.width;
+		   if(bucket.x > 1920 - bucket.width) bucket.x = 1920 - bucket.width;
 	   }
 	    
 
