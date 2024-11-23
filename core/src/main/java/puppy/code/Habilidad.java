@@ -9,7 +9,7 @@ package puppy.code;
  * @author Acer
  */
 public interface Habilidad {
-    void usarHabilidad();
+    void usarHabilidad(Tarro tarro);
     String obtenerNombre();
     int  obtenerCooldown();
     String obtenerCaracteristica();
