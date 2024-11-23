@@ -24,6 +24,8 @@ public class Tarro {
 	   private boolean herido = false;
 	   private int tiempoHeridoMax=50;
 	   private int tiempoHerido;
+	   private Habilidad habilidadActual;
+	   private float factorPuntaje = 1.0f;
            
            float scale = 0.15f;  // Cambia este valor para ajustar el tamaño
            
@@ -34,11 +36,33 @@ public class Tarro {
                 }
                 this.sonidoHerido = ss;
             }
+		
+
+		public Tarro() {
+			this.habilidadActual = HabilidadDash.obtenerInstancia();
+			this.bucket = new Rectangle(0, 20, 64, 64); // Inicializa el área del tarro
+		}
+
+		public void usarHabilidad() {
+			if (habilidadActual != null) {
+				habilidadActual.usarHabilidad(this); // Usar la habilidad actual
+			} else {
+				System.out.println("No hay habilidad asignada.");
+			}
+		}
 	   
 		public int getVidas() {
 			return vidas;
 		}
-	
+		public void setFactorPuntaje(float factor) {
+			this.factorPuntaje = factor; // Establece el nuevo factor de puntaje
+		}
+		public void resetFactorPuntaje() {
+			this.factorPuntaje = 1.0f; // Restaura el factor de puntaje original
+		}
+		public int obtenerPuntosConFactor() {
+			return (int) (puntos * factorPuntaje); // Retorna los puntos considerando el factor
+		}
 		public int getPuntos() {
 			return puntos;
 		}
@@ -48,9 +72,18 @@ public class Tarro {
 		public void sumarPuntos(int pp) {
 			puntos+=pp;
 		}
-                public void sumarVida(int vida) {
-			vidas+=vida;
+        public void sumarVida(int vida) {
+			this.vidas+=vida;
 		}
+		public void establecerHabilidad(Habilidad habilidad) {
+			this.habilidadActual = habilidad; // Cambiar la habilidad actual
+		}
+		
+    	
+
+    	public float getVelx() {
+        	return velx;
+    	}
 		
 	
 	   public void crear() {
@@ -58,7 +91,7 @@ public class Tarro {
                     // Ajustar el ancho y la altura de acuerdo a la escala
                     bucket.width = bucketImage.getRegionWidth() * scale;
                     bucket.height = bucketImage.getRegionHeight() * scale;
-                    bucket.x = 1920 / 2 - bucket.width / 2; // Centrar el tarro
+                    bucket.x = 1600 / 2 - bucket.width / 2; // Centrar el tarro
                     bucket.y = 20; // Altura del tarro
 		   
 	   }
@@ -99,7 +132,7 @@ public class Tarro {
 		   if(Gdx.input.isKeyPressed(Input.Keys.RIGHT)) bucket.x += velx * Gdx.graphics.getDeltaTime();
 		   // que no se salga de los bordes izq y der
 		   if(bucket.x < 0) bucket.x = 0;
-		   if(bucket.x > 1920 - bucket.width) bucket.x = 1920 - bucket.width;
+		   if(bucket.x > 1600 - bucket.width) bucket.x = 1600 - bucket.width;
 	   }
 	    
 
