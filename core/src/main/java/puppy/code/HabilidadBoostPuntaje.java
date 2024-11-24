@@ -49,6 +49,7 @@ public class HabilidadBoostPuntaje implements Habilidad {
         lastUsedTime = currentTime;
 
     }
+
     @Override
     public long getLastUsedTime() {
         return lastUsedTime;

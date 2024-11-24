@@ -89,14 +89,22 @@ public class GameScreen implements Screen, InputProcessor {
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) {
             tarro.establecerHabilidad(HabilidadDash.obtenerInstancia());
-            tarro.usarHabilidad();
+        
+            // Determinar la dirección del Dash
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+                ((HabilidadDash) tarro.getHabilidadActual()).setDashDirection(-1); // Mueve a la izquierda
+            } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+                ((HabilidadDash) tarro.getHabilidadActual()).setDashDirection(1);  // Mueve a la derecha
+            }
+        
+            tarro.getHabilidadActual().usarHabilidad(tarro); // Usar la habilidad
         }
         
-        if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
             tarro.establecerHabilidad(HabilidadCurar.obtenerInstancia()); // Establecer la habilidad de curar
             tarro.usarHabilidad(); 
         }
-        if (Gdx.input.isKeyJustPressed(Input.Keys.E)) {
+        if (Gdx.input.isKeyJustPressed(Input.Keys.W)) {
             tarro.establecerHabilidad(HabilidadBoostPuntaje.obtenerInstancia()); // Establecer la habilidad Boost de Puntaje
             tarro.usarHabilidad();
         }

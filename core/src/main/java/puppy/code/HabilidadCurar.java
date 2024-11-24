@@ -40,7 +40,6 @@ public class HabilidadCurar implements Habilidad {
     public long getLastUsedTime() {
         return lastUsedTime;
     }
-
     @Override
     public String obtenerNombre() {
         return nombre; // Retorna el nombre de la habilidad
