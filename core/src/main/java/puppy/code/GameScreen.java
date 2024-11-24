@@ -108,6 +108,10 @@ public class GameScreen implements Screen, InputProcessor {
             tarro.establecerHabilidad(HabilidadBoostPuntaje.obtenerInstancia()); // Establecer la habilidad Boost de Puntaje
             tarro.usarHabilidad();
         }
+        if (Gdx.input.isKeyJustPressed(Input.Keys.R)) {
+            tarro.establecerHabilidad(HabilidadEscudo.obtenerInstancia()); // Establecer la habilidad Boost de Puntaje
+            tarro.usarHabilidad();
+        }
         
         // Mostrar cooldown de la habilidad activa
         long currentTime = System.currentTimeMillis();

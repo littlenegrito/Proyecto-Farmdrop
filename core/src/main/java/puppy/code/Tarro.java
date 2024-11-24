@@ -102,11 +102,15 @@ public class Tarro {
 		   
 	   }
 	   public void dañar(int daño) {
+		if (habilidadActual instanceof HabilidadEscudo && ((HabilidadEscudo) habilidadActual).isEscudoActivo()) {
+			System.out.println("El escudo ha bloqueado el daño.");
+			return; // No se aplica daño si el escudo está activo
+		}
 		  vidas-= daño;
 		  herido = true;
 		  tiempoHerido=tiempoHeridoMax;
 		  sonidoHerido.play();
-	   }
+	    }
 	   public void dibujar(SpriteBatch batch) {
                 if (!herido) {
                     batch.draw(bucketImage, bucket.x, bucket.y, bucket.width, bucket.height);
