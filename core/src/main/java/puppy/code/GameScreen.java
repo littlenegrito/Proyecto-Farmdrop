@@ -31,10 +31,8 @@ public class GameScreen implements Screen, InputProcessor {
     private TextureRegion difficultyIcon, healingIcon;
     private TextureRegion healIcon, healIconDeactivated, dashIcon,dashIconDeactivated, shieldIcon,shieldIconDeactivated, boostIcon, boostIconDeactivated;
     private Map<Integer, Long> cooldowns = new HashMap<>();
-    private boolean mostrarDificultadIcon = false;
-    private long tiempoInicioDificultadIcon = 0;
-    private boolean mostrarHealIcon = false;
-    private long tiempoInicioHealIcon = 0;
+    private boolean[] mostrarIcon = new boolean[4];
+    private long[] tiempoInicioIcon = new long[4];
     private static final long DURACION_ICONO = 1000;
     private static final long DURACION_ICONO_DIFICULTAD = 1750;
     
@@ -74,38 +72,32 @@ public class GameScreen implements Screen, InputProcessor {
         if (!tarro.estaHerido()) {
             // Actualizar movimiento del tarro
             tarro.actualizarMovimiento();
-            // Actualizar el movimiento de los elementos en el entorno
-            if (!entorno.actualizarMovimiento(tarro)) {
+            // Actualizar el juego usando el método template de ProcesoJuego
+            entorno.actualizarJuego(tarro, tarro.getPuntos(), batch, mostrarIcon, tiempoInicioIcon); // Llamada al template method
+            if (tarro.getVidas()<=0) {
                 if (game.getHigherScore() < tarro.getPuntos()) {
                     game.setHigherScore(tarro.getPuntos());
                 }
                 game.setScreen(new GameOverScreen(game));
                 dispose();
             }
-            // Verificar si la dificultad aumentó y mostrar ícono
-            if (entorno.actualizarDificultad(tarro.getPuntos())) {
-                mostrarDificultadIcon = true;
-                tiempoInicioDificultadIcon = System.currentTimeMillis(); // Registrar el tiempo actual
-            }
-            
-            if (mostrarDificultadIcon) {
-               if(!drawIconDuration(batch, difficultyIcon, tiempoInicioDificultadIcon, DURACION_ICONO_DIFICULTAD, 1920 / 2, 1080 / 2, 2.5f)){
-                   mostrarDificultadIcon = false;
+            if (mostrarIcon[0]) {
+               if(!drawIconDuration(batch, difficultyIcon, tiempoInicioIcon[0], DURACION_ICONO_DIFICULTAD, 1920 / 2, 1080 / 2, 2.5f)){
+                   mostrarIcon[0] = false;
                }
             }
         }
         // Manejar entrada de habilidades
         handleInput();
-        if (mostrarHealIcon) {
-            if (!drawIconDuration(batch, healingIcon, tiempoInicioHealIcon, DURACION_ICONO, 1920 / 2, (1080 / 4), 5.0f)) {
-                mostrarHealIcon = false; // Después de que la duración pase, ponerlo en false
+        if (mostrarIcon[1]) {
+            if (!drawIconDuration(batch, healingIcon, tiempoInicioIcon[1], DURACION_ICONO, 1920 / 2, (1080 / 4), 5.0f)) {
+                mostrarIcon[1] = false; // Después de que la duración pase, ponerlo en false
             }
         }
         //if (mostrarBoostIcon) drawIconWDuration(batch, boostIcon, tiempoInicioBoostIcon, DURACION_ICONO_MS, 1920 / 2 + 100, 1080 / 2);
         //if (mostrarShieldIcon) drawIconDuration(batch, shieldIcon, tiempoInicioShieldIcon, DURACION_ICONO_MS, 1920 / 2, 1080 / 2 - 100);
         // Dibujar el tarro y los elementos
         tarro.dibujar(batch);
-        entorno.actualizarDibujo(batch);
         
         batch.draw(bannerTexture, 0, -20, 1920, 1080);
         font.getData().setScale(2.25f, 2.25f); // Cambiar tamaño del texto
@@ -174,8 +166,8 @@ public class GameScreen implements Screen, InputProcessor {
             cooldowns.put(Input.Keys.E, System.currentTimeMillis());
             
             // Activar la visualización del ícono de curación
-            mostrarHealIcon = true;
-            tiempoInicioHealIcon = System.currentTimeMillis();
+            mostrarIcon[1] = true;
+            tiempoInicioIcon[1] = System.currentTimeMillis();
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) { // Instancia de SHIELD
             tarro.establecerHabilidad(HabilidadEscudo.obtenerInstancia());
