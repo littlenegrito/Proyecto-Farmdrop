@@ -49,6 +49,7 @@ public class Fruta extends Alimentos {
     @Override
     public void activarEfecto(Tarro tarro){ // Personalizar efectos aplicados a jugador
         System.out.println("Suma de puntos: " + obtenerPuntaje());
+        aplicarModificador(tarro.obtenerFactor());
         tarro.sumarPuntos(obtenerPuntaje());
     }
     @Override

@@ -56,8 +56,8 @@ public class Tarro {
 		public void resetFactorPuntaje() {
 			this.factorPuntaje = 1.0f; // Restaura el factor de puntaje original
 		}
-		public int obtenerPuntosConFactor() {
-			return (int) (puntos * factorPuntaje); // Retorna los puntos considerando el factor
+		public float obtenerFactor() {
+			return factorPuntaje; 
 		}
 		public int getPuntos() {
 			return puntos;

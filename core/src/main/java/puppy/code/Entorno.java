@@ -63,7 +63,7 @@ public class Entorno {
 	rainMusic.play();
     }
     
-public void actualizarDificultad(int puntos) {
+public boolean actualizarDificultad(int puntos) {
         int nuevosUmbrales = puntos / umbralPuntos;
         if (nuevosUmbrales > puntosAlcanzados / umbralPuntos) {
             // Aumentar dificultad
@@ -78,7 +78,9 @@ public void actualizarDificultad(int puntos) {
             
             puntosAlcanzados = puntos;
             System.out.println("Dificultad aumentada! Velocidad Base: " + velocidadBase + ", Daño Chatarra: " + danioBaseChatarra + ", Curación Vegetal: " + curacionBaseVegetal + ", Puntaje Fruta: " + puntajeBaseFruta + ", Puntaje Vegetal: " + puntajeBaseVegetal);
+            return true;
         }
+        return false;
     }
     
    private void crearElemento() {

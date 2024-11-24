@@ -49,6 +49,7 @@ public class Vegetal extends Alimentos {
     public void activarEfecto(Tarro tarro){ // Personalizar efectos aplicados a jugador
         aplicarModificador(3); // Multiplicador de puntos
         System.out.println("Suma de puntos: " + obtenerPuntaje());
+        aplicarModificador(tarro.obtenerFactor());
         tarro.sumarPuntos(obtenerPuntaje());
         int vidaActual = tarro.getVidas();
         int vidaARecuperar = obtenerVida(); // Vida que el vegetal intenta curar
