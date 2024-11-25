@@ -32,7 +32,7 @@ public class JuegoEntorno extends ProcesoJuego { // clase concreta que define to
     private long limiteTiempoGeneracion = 100_000_000;
     
      // Umbrales de puntuación para aumentar dificultad
-    private int umbralPuntos = 250; // Cada ciertos puntos aumenta dificultad
+    private int umbralPuntos = 275; // Cada ciertos puntos aumenta dificultad
     private int puntosAlcanzados = 0;
     
     // Parámetros de generación dinámica

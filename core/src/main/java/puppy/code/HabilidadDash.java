@@ -55,6 +55,10 @@ public class HabilidadDash implements Habilidad {
     public int obtenerCooldown() {
         return cooldown;
     }
+    @Override
+    public float getDuration() {
+        return 0;
+    }
 
     @Override
     public String obtenerCaracteristica() {

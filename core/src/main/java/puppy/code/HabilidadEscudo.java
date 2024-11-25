@@ -9,7 +9,7 @@ public class HabilidadEscudo implements Habilidad {
     private int cooldown = 30; // Cooldown en segundos
     private String caracteristica = "Bloquea el siguiente daño recibido durante 3 segundos.";
     private long lastUsedTime = 0; // Tiempo de la última utilización
-    private long duration = 3000; // Duración del escudo en milisegundos
+    private float duration = 3.0f; // Duración del escudo en milisegundos
     private boolean isActive = false; // Estado del escudo
 
     // Constructor privado para evitar instanciación externa
@@ -39,13 +39,16 @@ public class HabilidadEscudo implements Habilidad {
 
         // Crear un nuevo hilo para manejar la duración del escudo
         new Thread(() -> {
-            try {
-                Thread.sleep(duration); // Espera el tiempo de duración
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            isActive = false; // Desactivar el escudo después de la duración
-            System.out.println("El escudo ha expirado.");
+        try {
+            // Convertir la duración de segundos (float) a milisegundos (long)
+            Thread.sleep((long) (duration * 1000)); 
+        } catch (InterruptedException e) {
+            // Imprimir la traza de la excepción sin detener el juego
+            Thread.currentThread().interrupt(); 
+            System.err.println("El escudo fue interrumpido: " + e.getMessage());
+        }
+        isActive = false; // Desactivar el escudo después de la duración
+        System.out.println("El escudo ha expirado.");
         }).start();
     }
 
@@ -56,6 +59,10 @@ public class HabilidadEscudo implements Habilidad {
     @Override
     public long getLastUsedTime() {
         return lastUsedTime;
+    }
+    @Override
+    public float getDuration() {
+        return duration;
     }
 
     @Override

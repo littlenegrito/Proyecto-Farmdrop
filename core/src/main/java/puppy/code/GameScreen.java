@@ -22,18 +22,17 @@ public class GameScreen implements Screen, InputProcessor {
     private SpriteBatch batch;
     private BitmapFont font;
     private Tarro tarro;
-    private Entorno entorno;
+    private ProcesoJuego entorno;
     private Sound hurtSound;
     private Sound dropSound;
     private Music rainMusic;
     private Texture backgroundTexture;
     private Texture bannerTexture;
-    private TextureRegion difficultyIcon, healingIcon;
+    private TextureRegion difficultyIcon, healingIcon, boostedIcon, shieldedIcon;
     private TextureRegion healIcon, healIconDeactivated, dashIcon,dashIconDeactivated, shieldIcon,shieldIconDeactivated, boostIcon, boostIconDeactivated;
     private Map<Integer, Long> cooldowns = new HashMap<>();
     private boolean[] mostrarIcon = new boolean[4];
     private long[] tiempoInicioIcon = new long[4];
-    private static final long DURACION_ICONO = 1000;
     private static final long DURACION_ICONO_DIFICULTAD = 1750;
     
     public GameScreen(final GameLluviaMenu game) {
@@ -41,7 +40,7 @@ public class GameScreen implements Screen, InputProcessor {
         this.batch = game.getBatch();
         this.font = game.getFont();
         
-        backgroundTexture = new Texture(Gdx.files.internal("background.jpg"));
+        backgroundTexture = new Texture(Gdx.files.internal("farm background.jpg"));
         bannerTexture = new Texture(Gdx.files.internal("banner.png"));
 
         // Inicializar sonidos
@@ -49,7 +48,7 @@ public class GameScreen implements Screen, InputProcessor {
         // Crear tarro del jugador
         tarro = new Tarro(game.getAtlas().findRegion("basket"), hurtSound);
         // Crear el entorno de juego (elementos como frutas, peligros, etc.)
-        entorno = new Entorno(game.getAtlas(),dropSound, rainMusic);
+        entorno = new JuegoEntorno(game.getAtlas(),dropSound, rainMusic);
         // camera
 	camera = new OrthographicCamera();
         camera.setToOrtho(false, 1920, 1080);
@@ -69,7 +68,7 @@ public class GameScreen implements Screen, InputProcessor {
         
          // Dibujar el fondo antes de otros elementos
         batch.draw(backgroundTexture, 0, 0, 1920, 1080);
-        if (!tarro.estaHerido()) {
+        
             // Actualizar movimiento del tarro
             tarro.actualizarMovimiento();
             // Actualizar el juego usando el método template de ProcesoJuego
@@ -82,20 +81,29 @@ public class GameScreen implements Screen, InputProcessor {
                 dispose();
             }
             if (mostrarIcon[0]) {
-               if(!drawIconDuration(batch, difficultyIcon, tiempoInicioIcon[0], DURACION_ICONO_DIFICULTAD, 1920 / 2, 1080 / 2, 2.5f)){
+               if(!drawIconDuration(batch, difficultyIcon, tiempoInicioIcon[0], DURACION_ICONO_DIFICULTAD, (1920 / 2) + 850, (1080 / 2) + 250, 4.5f)){
                    mostrarIcon[0] = false;
                }
             }
-        }
+        
         // Manejar entrada de habilidades
         handleInput();
         if (mostrarIcon[1]) {
-            if (!drawIconDuration(batch, healingIcon, tiempoInicioIcon[1], DURACION_ICONO, 1920 / 2, (1080 / 4), 5.0f)) {
-                mostrarIcon[1] = false; // Después de que la duración pase, ponerlo en false
+            if (!drawIconDuration(batch, boostedIcon, tiempoInicioIcon[1], HabilidadBoostPuntaje.obtenerInstancia().getDuration() * 1000, (1920 / 2) - 200, (1080 / 4), 5.0f)) {
+                mostrarIcon[1] = false;
             }
         }
-        //if (mostrarBoostIcon) drawIconWDuration(batch, boostIcon, tiempoInicioBoostIcon, DURACION_ICONO_MS, 1920 / 2 + 100, 1080 / 2);
-        //if (mostrarShieldIcon) drawIconDuration(batch, shieldIcon, tiempoInicioShieldIcon, DURACION_ICONO_MS, 1920 / 2, 1080 / 2 - 100);
+        if (mostrarIcon[2]) {
+            if (!drawIconDuration(batch, healingIcon, tiempoInicioIcon[2], HabilidadCurar.obtenerInstancia().getDuration() * 1000, 1920 / 2, (1080 / 4), 5.0f)) {
+                mostrarIcon[2] = false;
+            }
+        }
+        if (mostrarIcon[3]) {
+            if (!drawIconDuration(batch, shieldedIcon, tiempoInicioIcon[3], HabilidadEscudo.obtenerInstancia().getDuration() * 1000, (1920 / 2) + 200, (1080 / 4), 5.0f)) {
+                mostrarIcon[3] = false;
+            }
+        }
+ 
         // Dibujar el tarro y los elementos
         tarro.dibujar(batch);
         
@@ -129,7 +137,7 @@ public class GameScreen implements Screen, InputProcessor {
         float yPosition = camera.viewportHeight - 155;
         batch.draw(isOnCooldown ? deactivatedIcon : activeIcon, xPosition, yPosition, iconWidth, iconHeight);
     }
-   private boolean drawIconDuration(SpriteBatch batch, TextureRegion icon, long tiempoInicio, long duracion, int xPosition, int yPosition, float scale) {
+   private boolean drawIconDuration(SpriteBatch batch, TextureRegion icon, long tiempoInicio, float duracion, int xPosition, int yPosition, float scale) {
         long tiempoTranscurrido = System.currentTimeMillis() - tiempoInicio;
         if (tiempoTranscurrido < duracion) {
             // Ajustar el tamaño del ícono dependiendo del scaleFactor
@@ -144,37 +152,49 @@ public class GameScreen implements Screen, InputProcessor {
     }
     // Función para manejar entrada de habilidades
     private void handleInput(){
+        long currentTime = System.currentTimeMillis();
         if (Gdx.input.isKeyJustPressed(Input.Keys.Q)) { // Instancia de DASH
+            if (currentTime - cooldowns.getOrDefault(Input.Keys.Q, 0L) >= HabilidadDash.obtenerInstancia().obtenerCooldown() * 1000) {
             tarro.establecerHabilidad(HabilidadDash.obtenerInstancia());
-            cooldowns.put(Input.Keys.Q, System.currentTimeMillis()); 
+            cooldowns.put(Input.Keys.Q, currentTime); 
             if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
                 ((HabilidadDash) tarro.getHabilidadActual()).setDashDirection(-1);
             } else if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
                 ((HabilidadDash) tarro.getHabilidadActual()).setDashDirection(1);
             }
             tarro.getHabilidadActual().usarHabilidad(tarro);
+            }
         }
 
         if (Gdx.input.isKeyJustPressed(Input.Keys.W)) { // Instancia de BOOST
+            if (currentTime - cooldowns.getOrDefault(Input.Keys.W, 0L) >= HabilidadBoostPuntaje.obtenerInstancia().obtenerCooldown() * 1000) {
             tarro.establecerHabilidad(HabilidadBoostPuntaje.obtenerInstancia());
             tarro.usarHabilidad();
-            cooldowns.put(Input.Keys.W, System.currentTimeMillis());
+            cooldowns.put(Input.Keys.W, currentTime);
+            mostrarIcon[1] = true;
+            tiempoInicioIcon[1] = currentTime;
+            }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.E)) { // Instancia de HEAL
+            if (currentTime - cooldowns.getOrDefault(Input.Keys.E, 0L) >= HabilidadCurar.obtenerInstancia().obtenerCooldown() * 1000) {
             tarro.establecerHabilidad(HabilidadCurar.obtenerInstancia());
             tarro.usarHabilidad();
-            cooldowns.put(Input.Keys.E, System.currentTimeMillis());
-            
-            // Activar la visualización del ícono de curación
-            mostrarIcon[1] = true;
-            tiempoInicioIcon[1] = System.currentTimeMillis();
+            cooldowns.put(Input.Keys.E, currentTime);
+            mostrarIcon[2] = true;
+            tiempoInicioIcon[2] = currentTime;
+            }
         }
         if (Gdx.input.isKeyJustPressed(Input.Keys.R)) { // Instancia de SHIELD
+            if (currentTime - cooldowns.getOrDefault(Input.Keys.R, 0L) >= HabilidadEscudo.obtenerInstancia().obtenerCooldown() * 1000) {
             tarro.establecerHabilidad(HabilidadEscudo.obtenerInstancia());
             tarro.usarHabilidad();
-            cooldowns.put(Input.Keys.R, System.currentTimeMillis());
+            cooldowns.put(Input.Keys.R, currentTime);
+            mostrarIcon[3] = true;
+            tiempoInicioIcon[3] = currentTime;
+            }
         }
     }
+     
     @Override
     public void resize(int width, int height) {
         camera.setToOrtho(false, width, height);
@@ -206,10 +226,10 @@ public class GameScreen implements Screen, InputProcessor {
     }
     private void dibujarTexto(){
         // Mostrar teclas de habilidades
-        font.draw(batch, "Q", 865, camera.viewportHeight - 160);
-        font.draw(batch, "W", 1030, camera.viewportHeight - 160);
-        font.draw(batch, "E", 1195, camera.viewportHeight - 160);
-        font.draw(batch, "R", 1365, camera.viewportHeight - 160);
+        font.draw(batch, "Q", 865, camera.viewportHeight - 120);
+        font.draw(batch, "W", 1030, camera.viewportHeight - 120);
+        font.draw(batch, "E", 1200, camera.viewportHeight - 120);
+        font.draw(batch, "R", 1365, camera.viewportHeight - 120);
         
         // Dibujar la puntuación y vidas
         font.draw(batch, "" + tarro.getPuntos(), 200, camera.viewportHeight - 37);
@@ -226,6 +246,8 @@ public class GameScreen implements Screen, InputProcessor {
         rainMusic = Gdx.audio.newMusic(Gdx.files.internal("rain.MP3"));
         difficultyIcon = game.getAtlas().findRegion("difficulty icon");
         healingIcon = game.getAtlas().findRegion("healing icon");
+        shieldedIcon = game.getAtlas().findRegion("shielded icon");
+        boostedIcon = game.getAtlas().findRegion("boosted icon");
         healIcon = game.getAtlas().findRegion("heal icon");
         healIconDeactivated = game.getAtlas().findRegion("health icon deactivated");
         dashIcon = game.getAtlas().findRegion("dash icon");

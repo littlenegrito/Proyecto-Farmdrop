@@ -54,6 +54,10 @@ public class HabilidadBoostPuntaje implements Habilidad {
     public long getLastUsedTime() {
         return lastUsedTime;
     }
+    @Override
+    public float getDuration() {
+        return duracion;
+    }
 
     @Override
     public String obtenerNombre() {

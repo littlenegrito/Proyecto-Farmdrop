@@ -6,7 +6,8 @@ public class HabilidadCurar implements Habilidad {
 
     // Atributos de la habilidad
     private String nombre = "Curación";
-    private int cooldown = 5; // Cooldown en segundos
+    private int cooldown = 10; // Cooldown en segundos
+    private float duracion = 5.0f;
     private String caracteristica = "Recupera una cantidad de vida al tarro.";
     private int cantidadCuracion = 20; // Cantidad de vida que se recupera
     private long lastUsedTime = 0; // Tiempo en que se utilizó la habilidad por última vez
@@ -39,6 +40,10 @@ public class HabilidadCurar implements Habilidad {
     @Override
     public long getLastUsedTime() {
         return lastUsedTime;
+    }
+    @Override
+    public float getDuration() {
+        return duracion;
     }
     @Override
     public String obtenerNombre() {

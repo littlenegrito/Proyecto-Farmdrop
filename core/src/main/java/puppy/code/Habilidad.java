@@ -12,6 +12,7 @@ public interface Habilidad {
     void usarHabilidad(Tarro tarro);
     String obtenerNombre();
     int  obtenerCooldown();
+    public float getDuration();
     String obtenerCaracteristica();
     long getLastUsedTime();
 }
