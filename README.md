@@ -26,11 +26,11 @@ Farm Drop es un juego de recolección de recursos en el que el jugador controla 
 
 Movimiento: Usa las flechas de dirección ← y → para mover a la granjera.
 
-Habilidades (No implementadas en esta versión):
-  1. Tecla Q: Habilidad 1
-  2. Tecla W: Habilidad 2
-  3. Tecla E: Habilidad 3
-  4. Tecla R: Habilidad 4
+Habilidades:
+  1. Tecla Q: Dash
+  2. Tecla W: Boost de Puntaje
+  3. Tecla E: Curar 
+  4. Tecla R: Escudo
 
 ## Estructura del Proyecto
 Arquitectura General
